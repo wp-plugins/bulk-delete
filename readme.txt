@@ -31,7 +31,7 @@ If you looking for just moving posts, instead of deleting, then use [Bulk Move P
 
 ### Support
 
-Support for the Plugin is available from the [Plugin's home page][1]. If you have any questions or suggestions, do leave a comment there or contact me in [twitter][5].
+Support for the Plugin is available from the [Plugins home page][1]. If you have any questions or suggestions, do leave a comment there or contact me in [twitter][5].
 
 ### Links
 
@@ -69,7 +69,7 @@ In particular try to change the following settings
 *   max_input_time = 30; Maximum amount of time each script may spend parsing request data
 *   memory_limit = 256M ; Maximum amount of memory a script may consume (8MB)
 
-Additional FAQ and troubleshooting guide can be found in the [Plugins's homepage][1]
+Additional FAQ and troubleshooting guide can be found in the [Plugins homepage](http://sudarmuthu.com/bulk-delete)
 
 == Screenshot ==
 
@@ -89,7 +89,7 @@ Additional FAQ and troubleshooting guide can be found in the [Plugins's homepage
 
 ###v0.2 (2009-02-03)
 
-*   Fixed issues with pagging
+*   Fixed issues with paging
 
 ###v0.3 (2009-04-05)
 
@@ -144,7 +144,7 @@ Additional FAQ and troubleshooting guide can be found in the [Plugins's homepage
 ###v1.9 (2012-03-16)
 *   Added support for deleting by permalink. Credit Martin Capodici
 *   Fixed issues with translations
-*   Added Rusian translations
+*   Added Russian translations
 
 ###v2.0 (2012-04-01) Dev Time:  10 hours
 *   Fixed a major issue in how dates were handled.
