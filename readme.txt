@@ -45,7 +45,7 @@ The following are the list of pro addons that are currently available.
 
 #### Bulk Delete Schedule Categories
 
-This addon adds the ability to schedule auto delete of categories. This will be really useful, if you have to delete posts based on categories on a regular basis.
+This addon adds the ability to schedule auto delete of posts based on categories. This will be really useful, if you have to delete posts based on categories on a regular basis.
 
 The cost of this addon is $15 and you can buy it through [paypal](http://sudarmuthu.com/out/bulk-delete-category-addon).
 
@@ -116,9 +116,9 @@ The pot file is available with the Plugin. If you are willing to do translation 
 
 == Credits ==
 
-This Plugin uses the following JavaScript library
+Thanks <a href="http://www.martincapodici.com">Martin Capodici</a> for providing the code to implement the "delete specific page" feature.
 
-- [Time picker addon](http://trentrichardson.com/examples/timepicker/)
+Thanks to [Time picker addon](http://trentrichardson.com/examples/timepicker/) JavaScript library, which the Plugin uses.
 
 == Installation ==
 
@@ -150,11 +150,11 @@ The ability to schedule deletion of posts is available as a pro addon.
 
 == Screenshots ==
 
-1. Delete posts based on type
+1. The above screenshot shows how you can delete Posts by type. You can choose between drafts, revisions, Pending posts, scheduled posts, privates posts, pages etc..
 
-2. Delete Posts by Categories or Tags
+2. The above screenshot shows how you can delete posts by tag
 
-3. Delete Posts by Custom taxonomies
+3. The above screenshot shows how you can delete posts by Custom taxonomies
 
 == Changelog ==
 
