@@ -3,13 +3,14 @@
 Plugin Name: Bulk Delete
 Plugin Script: bulk-delete.php
 Plugin URI: http://sudarmuthu.com/wordpress/bulk-delete
-Description: Bulk delete posts from selected categories or tags. Use it with caution.
+Description: Bulk delete posts from selected categories, tags or custom taxonomies. Use it with caution.
 Donate Link: http://sudarmuthu.com/if-you-wanna-thank-me
-Version: 2.2.2
+Version: 3.0
 License: GPL
 Author: Sudar
 Author URI: http://sudarmuthu.com/
 Text Domain: bulk-delete
+Domain Path: languages/
 
 === RELEASE NOTES ===
 2009-02-02 - v0.1 - first version
@@ -44,6 +45,9 @@ Text Domain: bulk-delete
                   - Added Serbian translations
 2012-12-20 - v2.2.2 - (Dev time: 0.5 hour)
                   - Removed unused wpdb->prepare() function calls
+2013-04-27 - v3.0 - (Dev time: 10 hours)
+                  - Added support for pro addons
+                  - Added GUI to see cron jobs
 */
 
 /*  Copyright 2009  Sudar Muthu  (email : sudar@sudarmuthu.com)
@@ -63,261 +67,108 @@ Text Domain: bulk-delete
 */
 
 /**
- * Request Handler
+ * Bulk Delete Main class
  */
+class Bulk_Delete {
+    
+    const VERSION = '3.0';
+    const JS_HANDLE = 'bulk-delete';
+    const JS_VARIABLE = 'BULK_DELETE';
 
-if (!function_exists('smbd_request_handler')) {
-    function smbd_request_handler() {
-        global $wpdb;
-
+    /**
+     * Default constructor
+     */
+    public function __construct() {
         // Load localization domain
-        load_plugin_textdomain( 'bulk-delete', false, dirname(plugin_basename(__FILE__)) . '/languages' );
+        $this->translations = dirname(plugin_basename(__FILE__)) . '/languages/' ;
+        load_plugin_textdomain( 'bulk-delete', false, $this->translations);
 
-        if (isset($_POST['smbd_action'])) {
+        // Register hooks
+        add_action('admin_menu', array(&$this, 'add_menu'));
+        add_action('admin_init', array(&$this, 'request_handler'));
 
-            $wp_query = new WP_Query;
-            check_admin_referer( 'bulk-delete-posts');
+        // Add more links in the plugin listing page
+        add_filter('plugin_action_links', array(&$this, 'filter_plugin_actions'), 10, 2 );
+        add_filter( 'plugin_row_meta', array( &$this, 'add_plugin_links' ), 10, 2 );  
+    }
 
-            switch($_POST['smbd_action']) {
+    /**
+     * Add navigation menu
+     */
+	function add_menu() {
+	    //Add a submenu to Manage
+        $this->admin_page = add_options_page(__("Bulk Delete", 'bulk-delete'), __("Bulk Delete", 'bulk-delete'), 'delete_posts', basename(__FILE__), array(&$this, 'display_setting_page'));
+        $this->cron_page = add_options_page(__("Bulk Delete Schedules", 'bulk-delete'), __("Bulk Delete Schedules", 'bulk-delete'), 'delete_posts', 'bulk-delete-cron', array(&$this, 'display_cron_page'));
 
-                case "bulk-delete-cats":
-                    // delete by cats
-                    $selected_cats = array_get($_POST, 'smbd_cats');
+        add_action('admin_print_scripts-' . $this->admin_page, array(&$this, 'add_script'));
+	}
 
-                    if (array_get($_POST, 'smbd_cats_restrict', FALSE) == "true") {
-                        add_filter ('posts_where', 'smbd_cats_by_days');
-                    }
+    /**
+     * Enqueue JavaScript
+     */
+    function add_script() {
+        global $wp_scripts;
 
-                    $private = array_get($_POST, 'smbd_cats_private');
+        // uses code from http://trentrichardson.com/examples/timepicker/
+        wp_enqueue_script( 'jquery-ui-timepicker', plugins_url('/js/jquery-ui-timepicker.js', __FILE__), array('jquery-ui-slider', 'jquery-ui-datepicker'), '1.1.1', true);
+        wp_enqueue_script( self::JS_HANDLE, plugins_url('/js/bulk-delete.js', __FILE__), array('jquery-ui-timepicker'), self::VERSION, TRUE);
 
-                    if ($private == 'true') {
-                        $options = array('category__in'=>$selected_cats,'post_status'=>'private', 'post_type'=>'post');
-                    } else {
-                        $options = array('category__in'=>$selected_cats,'post_status'=>'publish', 'post_type'=>'post');
-                    }
+        $ui = $wp_scripts->query('jquery-ui-core');
 
-                    $limit_to = absint(array_get($_POST, 'smbd_cats_limits_to', 0));
+        $url = "http://ajax.aspnetcdn.com/ajax/jquery.ui/{$ui->ver}/themes/smoothness/jquery-ui.css";
+        wp_enqueue_style('jquery-ui-smoothness', $url, false, $ui->ver);
+        wp_enqueue_style('jquery-ui-timepicker', plugins_url('/style/jquery-ui-timepicker.css', __FILE__), array(), '1.1.1');
 
-                    if ($limit_to > 0) {
-                        $options['showposts'] = $limit_to;
-                    } else {
-                        $options['nopaging'] = 'true';
-                    }
+        // JavaScript messages
+        $msg = array(
+            'deletewarning' => __('Are you sure you want to delete all the selected posts', 'bulk-delete'),
+            'selectone' => __('Please select at least one', 'bulk-delete')
+        );
+        $translation_array = array( 'msg' => $msg );
+        wp_localize_script( self::JS_HANDLE, self::JS_VARIABLE, $translation_array );
+    }
 
-                    $force_delete = array_get($_POST, 'smbd_cats_force_delete', 'false');
+    /**
+     * Adds the settings link in the Plugin page. Based on http://striderweb.com/nerdaphernalia/2008/06/wp-use-action-links/
+     * @staticvar <type> $this_plugin
+     * @param <type> $links
+     * @param <type> $file
+     */
+    function filter_plugin_actions($links, $file) {
+        static $this_plugin;
+        if( ! $this_plugin ) $this_plugin = plugin_basename(__FILE__);
 
-                    if ($force_delete == 'true') {
-                        $force_delete = true;
-                    } else {
-                        $force_delete = false;
-                    }
-
-                    $posts = $wp_query->query($options);
-                    foreach ($posts as $post) {
-                        wp_delete_post($post->ID, $force_delete);
-                    }
-
-                    break;
-
-                case "bulk-delete-tags":
-                    // delete by tags
-                    $selected_tags = array_get($_POST, 'smbd_tags');
-                    if (array_get($_POST, 'smbd_tags_restrict', 'false') == "true") {
-                        add_filter ('posts_where', 'smbd_tags_by_days');
-                    }
-
-                    $private = array_get($_POST, 'smbd_tags_private', 'false');
-
-                    if ($private == 'true') {
-                        $options = array('tag__in'=>$selected_tags,'post_status'=>'private', 'post_type'=>'post');
-                    } else {
-                        $options = array('tag__in'=>$selected_tags,'post_status'=>'publish', 'post_type'=>'post');
-                    }
-
-                    $limit_to = absint(array_get($_POST, 'smbd_tags_limits_to', 0));
-
-                    if ($limit_to > 0) {
-                        $options['showposts'] = $limit_to;
-                    } else {
-                        $options['nopaging'] = 'true';
-                    }
-
-                    $force_delete = array_get($_POST, 'smbd_tags_force_delete');
-
-                    if ($force_delete == 'true') {
-                        $force_delete = true;
-                    } else {
-                        $force_delete = false;
-                    }
-
-                    $posts = $wp_query->query($options);
-                    
-                    foreach ($posts as $post) {
-                        wp_delete_post($post->ID, $force_delete);
-                    }
-                    
-                    break;
-
-                case "bulk-delete-taxs":
-                    // delete by taxs
-                    $selected_taxs = array_get($_POST, 'smbd_taxs');
-
-                    foreach ($selected_taxs as $selected_tax) {
-                        $postids = smbd_get_tax_post($selected_tax);
-                        
-                        if (array_get($_POST, 'smbd_taxs_restrict', 'false') == "true") {
-                            add_filter ('posts_where', 'smbd_taxs_by_days');
-                        }
-
-                        $private = array_get($_POST, 'smbd_taxs_private');
-
-                        if ($private == 'true') {
-                            $options = array('post__in'=>$postids,'post_status'=>'private', 'post_type'=>'post');
-                        } else {
-                            $options = array('post__in'=>$postids,'post_status'=>'publish', 'post_type'=>'post');
-                        }
-
-                        $limit_to = absint(array_get($_POST, 'smbd_taxs_limits_to', 0));
-
-                        if ($limit_to > 0) {
-                            $options['showposts'] = $limit_to;
-                        } else {
-                            $options['nopaging'] = 'true';
-                        }
-
-                        $force_delete = array_get($_POST, 'smbd_taxs_force_delete');
-
-                        if ($force_delete == 'true') {
-                            $force_delete = true;
-                        } else {
-                            $force_delete = false;
-                        }
-
-                        $posts = $wp_query->query($options);
-                        foreach ($posts as $post) {
-                            wp_delete_post($post->ID, $force_delete);
-                        }
-                    }
-                    
-                    break;
-
-                case "bulk-delete-special":
-                    $options = array();
-
-                    $limit_to = absint(array_get($_POST, 'smbd_special_limit_to', 0));
-
-                    if ($limit_to > 0) {
-                        $options['showposts'] = $limit_to;
-                    } else {
-                        $options['nopaging'] = 'true';
-                    }
-
-                    $force_delete = array_get($_POST, 'smbd_special_force_delete');
-                    if ($force_delete == 'true') {
-                        $force_delete = true;
-                    } else {
-                        $force_delete = false;
-                    }
-
-                    // Drafts
-                    if ("drafs" == array_get($_POST, 'smbd_drafs')) {
-                        $options['post_status'] = 'draft';
-                        $drafts = $wp_query->query($options);
-
-                        foreach ($drafts as $draft) {
-                            wp_delete_post($draft->ID, $force_delete);
-                        }
-                    }
-
-                    // Revisions
-                    if ("revisions" == array_get($_POST, 'smbd_revisions')) {
-                        $revisions = $wpdb->get_results("select ID from $wpdb->posts where post_type = 'revision'");
-
-                        foreach ($revisions as $revision) {
-                            wp_delete_post($revision->ID, $force_delete);
-                        }
-                    }
-
-                    // Pending Posts
-                    if ("pending" == array_get($_POST, 'smbd_pending')) {
-                        $pendings = $wpdb->get_results("select ID from $wpdb->posts where post_status = 'pending'");
-
-                        foreach ($pendings as $pending) {
-                            wp_delete_post($pending->ID, $force_delete);
-                        }
-                    }
-
-                    // Future Posts
-                    if ("future" == array_get($_POST, 'smbd_future')) {
-                        $futures = $wpdb->get_results("select ID from $wpdb->posts where post_status = 'future'");
-
-                        foreach ($futures as $future) {
-                            wp_delete_post($future->ID, $force_delete);
-                        }
-                    }
-
-                    // Private Posts
-                    if ("private" == array_get($_POST, 'smbd_private')) {
-                        $privates = $wpdb->get_results("select ID from $wpdb->posts where post_status = 'private'");
-
-                        foreach ($privates as $private) {
-                            wp_delete_post($private->ID, $force_delete);
-                        }
-                    }
-
-                    // Pages
-                    if ("pages" == array_get($_POST, 'smbd_pages')) {
-                        $options['post_type'] = 'page';
-                        $pages = $wp_query->query($options);
-
-                        foreach ($pages as $page) {
-                            wp_delete_post($page->ID, $force_delete);
-                        }
-                    }
-                    
-                    // Specific Pages
-                    if ("specificpages" == array_get($_POST, 'smdb_specific_pages')) {
-                        $urls = preg_split( '/\r\n|\r|\n/', array_get($_POST, 'smdb_specific_pages_urls') );
-                        foreach ($urls as $url) {
-                            $checkedurl = $url;
-                            if (substr($checkedurl ,0,1) == '/') {
-                                $checkedurl = get_site_url() . $checkedurl ;
-                            }
-                            $postid = url_to_postid( $checkedurl );
-                            wp_delete_post($postid, $force_delete);
-                        }
-                    }
-                    
-                    break;
-            }
-
-            // hook the admin notices action
-            add_action( 'admin_notices', 'smbd_deleted_notice', 9 );
+        if( $file == $this_plugin ) {
+            $settings_link = '<a href="options-general.php?page=bulk-delete.php">' . __('Manage', 'bulk-delete') . '</a>';
+            array_unshift( $links, $settings_link ); // before other links
         }
+        return $links;
     }
-}
 
-/**
- * Show deleted notice messages
- */
-if (!function_exists('smbd_deleted_notice')) {
-    function smbd_deleted_notice() {
-        echo "<div class = 'updated'><p>" . __("All the selected posts have been successfully deleted.", 'bulk-delete') . "</p></div>";
+    /**
+     * Adds additional links in the Plugin listing. Based on http://zourbuth.com/archives/751/creating-additional-wordpress-plugin-links-row-meta/
+     */
+    function add_plugin_links($links, $file) {
+        $plugin = plugin_basename(__FILE__);
+
+        if ($file == $plugin) // only for this plugin
+            return array_merge( $links, 
+            array( '<a href="http://sudarmuthu.com/out/bulk-delete-addons" target="_blank">' . __('Buy Addons', 'bulk-delete') . '</a>' )
+        );
+        return $links;
     }
-}
 
-/**
- * Show the Admin page
- */
-if (!function_exists('smbd_displayOptions')) {
-    function smbd_displayOptions() {
+    /**
+     * Show the Admin page
+     */
+    function display_setting_page() {
         global $wpdb;
 ?>
 	<div class="updated fade" style="background:#ff0;text-align:center;color: red;"><p><strong><?php _e("WARNING: Posts deleted once cannot be retrieved back. Use with caution.", 'bulk-delete'); ?></strong></p></div>
 
     <div class="wrap">
         <?php screen_icon(); ?>
-        <h2>Bulk Delete</h2>
+        <h2><?php _e('Bulk Delete', 'bulk-delete');?></h2>
 
         <div id = "poststuff" style = "float:left; width:75%">
         <div class = "postbox">
@@ -339,7 +190,7 @@ if (!function_exists('smbd_displayOptions')) {
         $pending = $wpdb->get_var("select count(*) from $wpdb->posts where post_status = 'pending'");
         $future = $wpdb->get_var("select count(*) from $wpdb->posts where post_status = 'future'");
         $private = $wpdb->get_var("select count(*) from $wpdb->posts where post_status = 'private'");
-        $pages = $wpdb->get_var("select count(*) from $wpdb->posts where post_type = 'page'");
+        $pages = $wpdb->get_var("select count(*) from $wpdb->posts where post_type = 'page' AND post_status = 'publish' ");
 ?>
         <fieldset class="options">
         <table class="optiontable">
@@ -509,6 +360,31 @@ if (!function_exists('smbd_displayOptions')) {
                     <?php _e("Only delete first ", 'bulk-delete');?>
                     <input type ="textbox" name="smbd_cats_limit_to" id="smbd_cats_limit_to" disabled value ="0" maxlength="4" size="4" /><?php _e("posts.", 'bulk-delete');?>
                     <?php _e("Use this option if there are more than 1000 posts and the script timesout.", 'bulk-delete') ?>
+                </td>
+            </tr>
+
+            <tr>
+                <td scope="row" colspan="2">
+                    <input name="smbd_cats_cron" value = "false" type = "radio" checked="checked" /> <?php _e('Delete now', 'bulk-delete'); ?>
+                    <input name="smbd_cats_cron" value = "true" type = "radio" id = "smbd_cats_cron" disabled > <?php _e('Schedule', 'bulk-delete'); ?>
+                    <input name="smbd_cats_cron_start" id = "smbd_cats_cron_start" value = "now" type = "text" disabled><?php _e('repeat ', 'bulk-delete');?>
+                    <select name = "smbd_cats_cron_freq" id = "smbd_cats_cron_freq" disabled>
+                        <option value = "-1"><?php _e("Don't repeat", 'bulk-delete'); ?></option>
+<?php
+        $schedules = wp_get_schedules();
+        foreach($schedules as $key => $value) {
+?>
+                        <option value = "<?php echo $key; ?>"><?php echo $value['display']; ?></option>
+<?php                        
+        }
+?>
+                    </select>
+                    <span class = "bd-cats-pro" style = "color:red"><?php _e('Only available in Pro Addon', 'bulk-delete'); ?> <a href = "http://sudarmuthu.com/out/bulk-delete-category-addon">Buy now</a></span>
+                </td>
+            </tr>
+            <tr>
+                <td scope="row" colspan="2">
+                    <?php _e("Enter time in Y-m-d H:i:s format or enter now to use current time", 'bulk-delete');?>
                 </td>
             </tr>
 
@@ -765,9 +641,321 @@ if (!function_exists('smbd_displayOptions')) {
 <?php
 
     // Display credits in Footer
-    add_action( 'in_admin_footer', 'smbd_admin_footer' );
+    add_action( 'in_admin_footer', array(&$this, 'admin_footer' ));
+    }
+
+    /**
+     * Adds Footer links. Based on http://striderweb.com/nerdaphernalia/2008/06/give-your-wordpress-plugin-credit/
+     */
+    function admin_footer() {
+        $plugin_data = get_plugin_data( __FILE__ );
+        printf('%1$s ' . __("plugin", 'bulk-delete') .' | ' . __("Version", 'bulk-delete') . ' %2$s | '. __('by', 'bulk-delete') . ' %3$s<br />', $plugin_data['Title'], $plugin_data['Version'], $plugin_data['Author']);
+    }
+
+    /**
+     * Display the schedule page
+     */
+    function display_cron_page() {
+        
+        if(!class_exists('WP_List_Table')){
+            require_once( ABSPATH . WPINC . '/class-wp-list-table.php' );
+        }
+        if (!class_exists('Cron_List_Table')) {
+            require_once dirname(__FILE__) . '/include/class-cron-list-table.php';
+        }
+
+        //Prepare Table of elements
+        $cron_list_table = new Cron_List_Table();
+        $cron_list_table->prepare_items($this->get_cron_schedules());
+
+?>
+    <div class="wrap">
+        <?php screen_icon(); ?>
+        <h2><?php _e('Bulk Delete Schedules', 'bulk-delete');?></h2>
+<?php        
+        //Table of elements
+        $cron_list_table->display();
+?>
+    </div>
+<?php
+    }
+
+    /**
+     * Request Handler
+     */
+    function request_handler() {
+        global $wpdb;
+
+        if (isset($_GET['smbd_action'])) {
+
+            switch($_GET['smbd_action']) {
+
+                case 'delete-cron':
+                    //TODO: Check for nonce and referer
+                    $cron_id = absint($_GET['cron_id']);
+                    $cron_items = $this->get_cron_schedules();
+                    wp_unschedule_event($cron_items[$cron_id]['timestamp'], $cron_items[$cron_id]['type'], $cron_items[$cron_id]['args']);
+
+                    break;
+            }
+        }
+
+        if (isset($_POST['smbd_action'])) {
+
+            $wp_query = new WP_Query;
+            check_admin_referer( 'bulk-delete-posts');
+
+            switch($_POST['smbd_action']) {
+
+                case "bulk-delete-cats":
+                    // delete by cats
+
+                    $delete_options = array();
+                    $delete_options['selected_cats'] = array_get($_POST, 'smbd_cats');
+                    $delete_options['restrict'] = array_get($_POST, 'smbd_cats_restrict', FALSE);
+                    $delete_options['private'] = array_get($_POST, 'smbd_cats_private');
+                    $delete_options['limit_to'] = absint(array_get($_POST, 'smbd_cats_limits_to', 0));
+                    $delete_options['force_delete'] = array_get($_POST, 'smbd_cats_force_delete', 'false');
+
+                    $delete_options['cats_op'] = array_get($_POST, 'smbd_cats_op');
+                    $delete_options['cats_days'] = array_get($_POST, 'smbd_cats_days');
+                    
+                    if (array_get($_POST, 'smbd_cats_cron', 'false') == 'true') {
+                        $freq = $_POST['smbd_cats_cron_freq'];
+                        $time = strtotime($_POST['smbd_cats_cron_start']) - get_option('gmt_offset');
+
+                        if ($freq == -1) {
+                            wp_schedule_single_event($time, 'do-bulk-delete-cats', array($delete_options));
+                        } else {
+                            wp_schedule_event($time, $freq , 'do-bulk-delete-cats', array($delete_options));
+                        }
+                    } else {
+                        smbd_delete_cats($delete_options);
+                    }
+                    
+                    break;
+
+                case "bulk-delete-tags":
+                    // delete by tags
+                    $selected_tags = array_get($_POST, 'smbd_tags');
+                    if (array_get($_POST, 'smbd_tags_restrict', 'false') == "true") {
+                        add_filter ('posts_where', 'smbd_tags_by_days');
+                    }
+
+                    $private = array_get($_POST, 'smbd_tags_private', 'false');
+
+                    if ($private == 'true') {
+                        $options = array('tag__in'=>$selected_tags,'post_status'=>'private', 'post_type'=>'post');
+                    } else {
+                        $options = array('tag__in'=>$selected_tags,'post_status'=>'publish', 'post_type'=>'post');
+                    }
+
+                    $limit_to = absint(array_get($_POST, 'smbd_tags_limits_to', 0));
+
+                    if ($limit_to > 0) {
+                        $options['showposts'] = $limit_to;
+                    } else {
+                        $options['nopaging'] = 'true';
+                    }
+
+                    $force_delete = array_get($_POST, 'smbd_tags_force_delete');
+
+                    if ($force_delete == 'true') {
+                        $force_delete = true;
+                    } else {
+                        $force_delete = false;
+                    }
+
+                    $posts = $wp_query->query($options);
+                    
+                    foreach ($posts as $post) {
+                        wp_delete_post($post->ID, $force_delete);
+                    }
+                    
+                    break;
+
+                case "bulk-delete-taxs":
+                    // delete by taxs
+                    $selected_taxs = array_get($_POST, 'smbd_taxs');
+
+                    foreach ($selected_taxs as $selected_tax) {
+                        $postids = smbd_get_tax_post($selected_tax);
+                        
+                        if (array_get($_POST, 'smbd_taxs_restrict', 'false') == "true") {
+                            add_filter ('posts_where', 'smbd_taxs_by_days');
+                        }
+
+                        $private = array_get($_POST, 'smbd_taxs_private');
+
+                        if ($private == 'true') {
+                            $options = array('post__in'=>$postids,'post_status'=>'private', 'post_type'=>'post');
+                        } else {
+                            $options = array('post__in'=>$postids,'post_status'=>'publish', 'post_type'=>'post');
+                        }
+
+                        $limit_to = absint(array_get($_POST, 'smbd_taxs_limits_to', 0));
+
+                        if ($limit_to > 0) {
+                            $options['showposts'] = $limit_to;
+                        } else {
+                            $options['nopaging'] = 'true';
+                        }
+
+                        $force_delete = array_get($_POST, 'smbd_taxs_force_delete');
+
+                        if ($force_delete == 'true') {
+                            $force_delete = true;
+                        } else {
+                            $force_delete = false;
+                        }
+
+                        $posts = $wp_query->query($options);
+                        foreach ($posts as $post) {
+                            wp_delete_post($post->ID, $force_delete);
+                        }
+                    }
+                    
+                    break;
+
+                case "bulk-delete-special":
+                    $options = array();
+
+                    $limit_to = absint(array_get($_POST, 'smbd_special_limit_to', 0));
+
+                    if ($limit_to > 0) {
+                        $options['showposts'] = $limit_to;
+                    } else {
+                        $options['nopaging'] = 'true';
+                    }
+
+                    $force_delete = array_get($_POST, 'smbd_special_force_delete');
+                    if ($force_delete == 'true') {
+                        $force_delete = true;
+                    } else {
+                        $force_delete = false;
+                    }
+
+                    // Drafts
+                    if ("drafs" == array_get($_POST, 'smbd_drafs')) {
+                        $options['post_status'] = 'draft';
+                        $drafts = $wp_query->query($options);
+
+                        foreach ($drafts as $draft) {
+                            wp_delete_post($draft->ID, $force_delete);
+                        }
+                    }
+
+                    // Revisions
+                    if ("revisions" == array_get($_POST, 'smbd_revisions')) {
+                        $revisions = $wpdb->get_results("select ID from $wpdb->posts where post_type = 'revision'");
+
+                        foreach ($revisions as $revision) {
+                            wp_delete_post($revision->ID, $force_delete);
+                        }
+                    }
+
+                    // Pending Posts
+                    if ("pending" == array_get($_POST, 'smbd_pending')) {
+                        $pendings = $wpdb->get_results("select ID from $wpdb->posts where post_status = 'pending'");
+
+                        foreach ($pendings as $pending) {
+                            wp_delete_post($pending->ID, $force_delete);
+                        }
+                    }
+
+                    // Future Posts
+                    if ("future" == array_get($_POST, 'smbd_future')) {
+                        $futures = $wpdb->get_results("select ID from $wpdb->posts where post_status = 'future'");
+
+                        foreach ($futures as $future) {
+                            wp_delete_post($future->ID, $force_delete);
+                        }
+                    }
+
+                    // Private Posts
+                    if ("private" == array_get($_POST, 'smbd_private')) {
+                        $privates = $wpdb->get_results("select ID from $wpdb->posts where post_status = 'private'");
+
+                        foreach ($privates as $private) {
+                            wp_delete_post($private->ID, $force_delete);
+                        }
+                    }
+
+                    // Pages
+                    if ("pages" == array_get($_POST, 'smbd_pages')) {
+                        $options['post_type'] = 'page';
+                        $pages = $wp_query->query($options);
+
+                        foreach ($pages as $page) {
+                            wp_delete_post($page->ID, $force_delete);
+                        }
+                    }
+                    
+                    // Specific Pages
+                    if ("specificpages" == array_get($_POST, 'smdb_specific_pages')) {
+                        $urls = preg_split( '/\r\n|\r|\n/', array_get($_POST, 'smdb_specific_pages_urls') );
+                        foreach ($urls as $url) {
+                            $checkedurl = $url;
+                            if (substr($checkedurl ,0,1) == '/') {
+                                $checkedurl = get_site_url() . $checkedurl ;
+                            }
+                            $postid = url_to_postid( $checkedurl );
+                            wp_delete_post($postid, $force_delete);
+                        }
+                    }
+                    
+                    break;
+            }
+
+            // hook the admin notices action
+            add_action( 'admin_notices', array(&$this, 'deleted_notice'), 9 );
+        }
+    }
+
+    /**
+     * Show deleted notice messages
+     */
+    function deleted_notice() {
+        echo "<div class = 'updated'><p>" . __("All the selected posts have been successfully deleted.", 'bulk-delete') . "</p></div>";
+    }
+
+    /**
+     * Get the list of cron schedules
+     *
+     * @return array - The list of cron schedules
+     */
+    private function get_cron_schedules() {
+
+        $cron_items = array();
+		$cron = _get_cron_array();
+		$date_format = _x( 'M j, Y @ G:i', 'Cron table date format', 'bulk-delete' );
+        $i = 0;
+
+		foreach ( $cron as $timestamp => $cronhooks ) {
+			foreach ( (array) $cronhooks as $hook => $events ) {
+                if (substr($hook, 0, 15) == 'do-bulk-delete-') {
+                    $cron_item = array();
+
+                    foreach ( (array) $events as $key => $event ) {
+                        $cron_item['timestamp'] = $timestamp;
+                        $cron_item['due'] = date_i18n( $date_format, $timestamp );
+                        $cron_item['schedule'] = $event['schedule'];
+                        $cron_item['type'] = $hook;
+                        $cron_item['args'] = $event['args'];
+                        $cron_item['id'] = $i;
+                    }
+
+                    $cron_items[$i] = $cron_item;
+                    $i++;
+                }
+            }
+        }
+        return $cron_items;
     }
 }
+
+// Start this plugin once all other plugins are fully loaded
+add_action( 'init', 'Bulk_Delete' ); function Bulk_Delete() { global $Bulk_Delete; $Bulk_Delete = new Bulk_Delete(); }
 
 /**
  * Check whether a key is present. If present returns the value, else returns the default value
@@ -779,8 +967,10 @@ if (!function_exists('smbd_displayOptions')) {
  * @return <mixed> If present returns the value, else returns the default value
  * @author Sudar
  */
-function array_get($array, $key, $default = NULL) {
-    return isset($array[$key]) ? $array[$key] : $default;
+if (!function_exists('array_get')) {
+    function array_get($array, $key, $default = NULL) {
+        return isset($array[$key]) ? $array[$key] : $default;
+    }
 }
 
 /**
@@ -857,114 +1047,79 @@ if (!function_exists('smbd_get_tax_post')) {
 }
 
 /**
- * Add navigation menu
+ * Delete posts by category
  */
-if(!function_exists('smbd_add_menu')) {
-	function smbd_add_menu() {
-	    //Add a submenu to Manage
-        $page = add_options_page("Bulk Delete", "Bulk Delete", 'manage_options', basename(__FILE__), "smbd_displayOptions");
-	}
-}
+function smbd_delete_cats($delete_options) {
 
-/**
- * Adds the settings link in the Plugin page. Based on http://striderweb.com/nerdaphernalia/2008/06/wp-use-action-links/
- * @staticvar <type> $this_plugin
- * @param <type> $links
- * @param <type> $file
- */
-if (!function_exists('smbd_filter_plugin_actions')) {
-    function smbd_filter_plugin_actions($links, $file) {
-        static $this_plugin;
-        if( ! $this_plugin ) $this_plugin = plugin_basename(__FILE__);
+    $selected_cats = $delete_options['selected_cats'];
 
-        if( $file == $this_plugin ) {
-            $settings_link = '<a href="options-general.php?page=bulk-delete.php">' . _('Manage') . '</a>';
-            array_unshift( $links, $settings_link ); // before other links
-        }
-        return $links;
-    }
-}
+    $private = $delete_options['private'];
 
-/**
- * Adds Footer links. Based on http://striderweb.com/nerdaphernalia/2008/06/give-your-wordpress-plugin-credit/
- */
-if (!function_exists('smbd_admin_footer')) {
-function smbd_admin_footer() {
-    $plugin_data = get_plugin_data( __FILE__ );
-    printf('%1$s ' . __("plugin", 'bulk-delete') .' | ' . __("Version", 'bulk-delete') . ' %2$s | '. __('by', 'bulk-delete') . ' %3$s<br />', $plugin_data['Title'], $plugin_data['Version'], $plugin_data['Author']);
-?>
-<script type="text/javascript">
-
-/**
- * Toggle closing of different sections
- *
- */
-jQuery(document).ready( function() {
-    jQuery('.postbox h3').click( function() {
-        jQuery(jQuery(this).parent().get(0)).toggleClass('closed');
-    });
-});
-
-/**
-* Check All Checkboxes
-*/
-function bd_checkAll(form) {
-    for (i = 0, n = form.elements.length; i < n; i++) {
-        if(form.elements[i].type == "checkbox" && !(form.elements[i].getAttribute('onclick',2))) {
-            if(form.elements[i].checked == true)
-                form.elements[i].checked = false;
-            else
-                form.elements[i].checked = true;
-        }
-    }
-}
-
-function toggle_date_restrict(el) {
-    if (jQuery("#smbd_" + el + "_restrict").is(":checked")) {
-        jQuery("#smbd_" + el + "_op").removeAttr('disabled');
-        jQuery("#smbd_" + el + "_days").removeAttr('disabled');
+    if ($private == 'true') {
+        $options = array('category__in'=>$selected_cats,'post_status'=>'private', 'post_type'=>'post');
     } else {
-        jQuery("#smbd_" + el + "_op").attr('disabled', 'true');
-        jQuery("#smbd_" + el + "_days").attr('disabled', 'true');
+        $options = array('category__in'=>$selected_cats,'post_status'=>'publish', 'post_type'=>'post');
     }
-}
 
-function toggle_limit_restrict(el) {
-    if (jQuery("#smbd_" + el + "_limit").is(":checked")) {
-        jQuery("#smbd_" + el + "_limit_to").removeAttr('disabled');
+    $limit_to = $delete_options['limit_to'];
+
+    if ($limit_to > 0) {
+        $options['showposts'] = $limit_to;
     } else {
-        jQuery("#smbd_" + el + "_limit_to").attr('disabled', 'true');
+        $options['nopaging'] = 'true';
+    }
+
+    $force_delete = $delete_options['force_delete'];
+
+    if ($force_delete == 'true') {
+        $force_delete = true;
+    } else {
+        $force_delete = false;
+    }
+
+    if ($delete_options['restrict'] == "true") {
+        $options['cats_op'] = $delete_options['cats_op'];
+        $options['cats_days'] = $delete_options['cats_days'];
+
+        $bulkDeleteCatDays = new BulkDeleteCatDays;
+    }
+
+    $wp_query = new WP_Query();
+    $posts = $wp_query->query($options);
+
+    foreach ($posts as $post) {
+        wp_delete_post($post->ID, $force_delete);
     }
 }
 
 /**
-* Validate Form
-*/
-function bd_validateForm(form) {
-    var valid = false;
-    for (i = 0, n = form.elements.length; i < n; i++) {
-        if(form.elements[i].type == "checkbox" && !(form.elements[i].getAttribute('onclick',2))) {
-            if(form.elements[i].checked == true) {
-                valid = true;
-                break;
-            }
+ * Class that encapsulates the deletion of Categories
+ */
+class BulkDeleteCatDays {
+    var $days;
+    var $op;
+
+    public function __construct(){
+        add_action( 'parse_query', array( $this, 'parse_query' ) );
+    }
+
+    public function parse_query( $query ) {
+        if( isset( $query->query_vars['cats_days'] ) ){
+            $this->days = $query->query_vars['cats_days'];
+            $this->op = $query->query_vars['cats_op'];
+
+            add_filter( 'posts_where', array( $this, 'filter_where' ) );
+            add_filter( 'posts_selection', array( $this, 'remove_where' ) );
         }
     }
 
-    if (valid) {
-        return confirm("<?php _e('Are you sure you want to delete all the selected posts', 'bulk-delete'); ?>");
-    } else {
-        alert ("<?php _e('Please select at least one', 'bulk-delete'); ?>");
-        return false;
+    public function filter_where($where = '') {
+        $where .= " AND post_date " . $this->op . " '" . date('y-m-d', strtotime('-' . $this->days . ' days')) . "'";
+        return $where;
+    }
+
+    public function remove_where() {
+        remove_filter( 'posts_where', array( $this, 'filter_where' ) );
     }
 }
-</script>
-
-<?php    
-}
-}
-
-add_filter( 'plugin_action_links', 'smbd_filter_plugin_actions', 10, 2 );
-add_action('admin_menu', 'smbd_add_menu');
-add_action('admin_init', 'smbd_request_handler');
 ?>
