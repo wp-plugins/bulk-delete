@@ -4,7 +4,7 @@ Tags: post, comment, delete, bulk, draft, revision, page
 Requires at least: 2.0  
 Tested up to: 3.5.1  
 Donate Link: http://sudarmuthu.com/if-you-wanna-thank-me  
-Stable tag: 3.0  
+Stable tag: 3.1  
 
 Bulk delete posts from selected categories, tags or custom taxonomies
 
@@ -24,6 +24,7 @@ This Plugin supports the following bulk delete options
 - Delete all post revisions
 - Delete all pending posts
 - Delete all private posts
+- Delete all scheduled posts
 - Delete all drafts
 
 All the above options support the following filters
@@ -158,6 +159,11 @@ The ability to schedule deletion of posts is available as a pro addon.
 
 == Changelog ==
 
+= 2013-04-28 - v3.1 - (Dev time: 5 hours) =
+* Added separate delete by sections for pages, drafts and urls
+* Added the option to delete by date for drafts, revisions, future posts etc
+* Added the option to delete by date for pages
+
 = 2013-04-27 - v3.0 - (Dev time: 10 hours) =
 * Added support for pro addons
 * Added GUI to see cron jobs
@@ -239,6 +245,12 @@ The ability to schedule deletion of posts is available as a pro addon.
 
 = v0.1 (2009-02-02) =
 *   First version
+
+== Upgrade Notice ==
+
+= 3.1 =
+
+Added the option to delete by date for pages, drafts, revisions, future posts etc
 
 == Readme Generator ==
 
