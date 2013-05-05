@@ -20,8 +20,21 @@ jQuery(document).ready(function () {
     jQuery('#smbd_cats_cron_start').datetimepicker({
         timeFormat: 'HH:mm:ss'
     });
+
+    jQuery('#smbd_tags_cron_start').datetimepicker({
+        timeFormat: 'HH:mm:ss'
+    });
+
+    jQuery('#smbd_pages_cron_start').datetimepicker({
+        timeFormat: 'HH:mm:ss'
+    });
+
+    jQuery('#smbd_post_status_cron_start').datetimepicker({
+        timeFormat: 'HH:mm:ss'
+    });
 });
 
+// TODO: Bring these global functions inside the jQuery document selection callback
 /**
  * Check All Check boxes
  */
