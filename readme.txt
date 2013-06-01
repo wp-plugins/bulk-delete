@@ -4,7 +4,7 @@ Tags: post, comment, delete, bulk, mass, draft, revision, page
 Requires at least: 2.0  
 Tested up to: 3.5.1  
 Donate Link: http://sudarmuthu.com/if-you-wanna-thank-me  
-Stable tag: 3.4  
+Stable tag: 3.5  
 
 Bulk delete posts from selected categories, tags, custom taxonomies or by post type like drafts, scheduled posts, revisions etc.
 
@@ -21,6 +21,7 @@ This Plugin supports the following bulk delete options for deleting posts
 - Delete posts by category
 - Delete posts by tags
 - Delete posts by custom taxonomies
+- Delete posts by custom post types
 - Delete posts by url
 - Delete all draft posts
 - Delete all pending posts
@@ -59,7 +60,7 @@ Like posts, all the above options support the following filters as well
 
 - Delete all post revisions
 
-#### Deleting by custom post types and by content
+#### Deleting by content and page views
 
 Coming soon :)
 
@@ -74,6 +75,7 @@ The following are the list of pro addons that are currently available for purcha
 - **Bulk Delete Schedule Categories** - Adds the ability to schedule auto delete of posts based on categories. [More details](http://sudarmuthu.com/wordpress/bulk-delete/pro-addons#bulk-delete-schedule-categories). [Buy now](http://sudarmuthu.com/out/buy-bulk-delete-category-addon)
 - **Bulk Delete Schedule Tags** - Adds the ability to schedule auto delete of posts based on tags. [More details](http://sudarmuthu.com/wordpress/bulk-delete/pro-addons#bulk-delete-schedule-tags). [Buy now](http://sudarmuthu.com/out/buy-bulk-delete-tags-addon)
 - **Bulk Delete Schedule Custom Taxonomies** - Adds the ability to schedule auto delete of posts based on custom taxonomies. [More details](http://sudarmuthu.com/wordpress/bulk-delete/pro-addons#bulk-delete-schedule-taxonomy). [Buy now](http://sudarmuthu.com/out/buy-bulk-delete-taxonomy-addon)
+- **Bulk Delete Schedule Custom post types** - Adds the ability to schedule auto delete of posts based on custom post types. [More details](http://sudarmuthu.com/wordpress/bulk-delete/pro-addons#bulk-delete-schedule-post-types). [Buy now](http://sudarmuthu.com/out/buy-bulk-delete-post-type-addon)
 - **Bulk Delete Schedule Pages** - Adds the ability to schedule auto delete of pages. [More details](http://sudarmuthu.com/wordpress/bulk-delete/pro-addons#bulk-delete-schedule-pages). [Buy now](http://sudarmuthu.com/out/buy-bulk-delete-pages-addon)
 - **Bulk Delete Schedule by Post Status** - Adds the ability to schedule auto delete of posts based on post status like drafts, pending posts, scheduled posts etc. [More details](http://sudarmuthu.com/wordpress/bulk-delete/pro-addons#bulk-delete-schedule-post-status). [Buy now](http://sudarmuthu.com/out/buy-bulk-delete-post-status-addon)
 
@@ -89,7 +91,6 @@ If you are looking for ideas, then you can start with one of the following TODO 
 
 The following are the features that I am thinking of adding to the Plugin, when I get some free time. If you have any feature request or want to increase the priority of a particular feature, then let me know.
 
-- Bulk Delete by custom post types
 - Bulk Delete posts based on page views
 - Bulk Delete sticky posts
 - Bulk delete based on the presence/absence of a word
@@ -100,6 +101,7 @@ The following are the features that I am thinking of adding to the Plugin, when 
 - <del>Change the message based on the option the user has chosen</del> - Added in v3.3
 - <del>Expandable/collapsible taxonomies</del> - Added in v3.3
 - <del>Ability to choose the different sections that should be loaded</del> - Added in v3.4
+- <del>Bulk Delete by custom post types</del> - Added in v3.5
 
 ### Support
 
@@ -107,6 +109,7 @@ The following are the features that I am thinking of adding to the Plugin, when 
 - If you have a question about usage or need help to troubleshoot, then post in WordPress forums or leave a comment in [Plugins's home page][1]
 - If you like the Plugin, then kindly leave a review/feedback at [WordPress repo page][8].
 - If you find this Plugin useful or and wanted to say thank you, then there are ways to [make me happy](http://sudarmuthu.com/if-you-wanna-thank-me) :) and I would really appreciate if you can do one of those.
+- Checkout other [WordPress Plugins][5] that I have written
 - If anything else, then contact me in [twitter][3].
 
  [1]: http://sudarmuthu.com/wordpress/bulk-delete
@@ -133,6 +136,7 @@ The Plugin currently has translations for the following languages.
 *   Lithuanian (Thanks Vincent G)
 *   Hindi (Thanks Love Chandel)
 *   Serbian (Thanks Diana)
+*   Gujarati (Thanks Puneet)
 
 The pot file is available with the Plugin. If you are willing to do translation for the Plugin, use the pot file to create the .po files for your language and let me know.
 
@@ -195,6 +199,11 @@ The ability to schedule deletion of posts is available as a pro addon.
 8. The above screenshot shows how you can enable/disable different sections of the Plugin.
 
 == Changelog ==
+
+= 2013-06-01 - v3.5 - (Dev time: 10 hours) =
+- Added support to delete custom post types
+- Added Gujarati translations
+- Ignore sticky posts when deleting drafts
 
 = 2013-05-22 - v3.4 - (Dev time: 20 hours) =
 * Incorporated Screen API to select/deselect different sections of the page
@@ -305,6 +314,9 @@ The ability to schedule deletion of posts is available as a pro addon.
 *   First version
 
 == Upgrade Notice ==
+
+= 3.5 =
+Added the ability to delete posts by custom post types.
 
 = 3.4 =
 Added the ability to disable different sections of the Plugin.
