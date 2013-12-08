@@ -127,22 +127,52 @@ class Bulk_Delete_Posts {
             return;
         }
 
+        $types =  get_post_types( array(
+            'public'   => true,
+            '_builtin' => false
+            ), 'names'
+        );
+
+        array_unshift( $types, 'post' );
 ?>
         <!-- Category Start-->
-        <h4><?php _e("Select the categories whose post you want to delete", 'bulk-delete'); ?></h4>
-
+        <h4><?php _e( 'Select the post type whose category posts you want to delete', 'bulk-delete' ); ?></h4>
         <fieldset class="options">
         <table class="optiontable">
 <?php
-        $categories =  get_categories(array('hide_empty' => false));
-        foreach ($categories as $category) {
+        foreach ( $types as $type ) {
 ?>
             <tr>
                 <td scope="row" >
-                    <input name="smbd_cats[]" value = "<?php echo $category->cat_ID; ?>" type = "checkbox" />
+                <input name="smbd_cat_post_type" value = "<?php echo $type; ?>" type = "radio"  class = "smbd_cat_post_type" <?php checked( $type, 'post' ); ?>>
                 </td>
                 <td>
-                    <label for="smbd_cats"><?php echo $category->cat_name; ?> (<?php echo $category->count . " "; _e("Posts", 'bulk-delete'); ?>)</label>
+                    <label for="smbd_cat_post_type"><?php echo $type; ?> </label>
+                </td>
+            </tr>
+<?php
+        }
+?>
+        </table>
+
+        <h4><?php _e( 'Select the categories whose post you want to delete', 'bulk-delete' ); ?></h4>
+        <p><?php _e( 'Note: The post count below for each category is the total number of posts in that category, irrespective of post type', 'bulk-delete' ); ?></p>
+<?php
+        $categories =  get_categories( array(
+            'hide_empty' => false
+            )
+        );
+?>
+        <table class="optiontable">
+<?php
+        foreach ( $categories as $category ) {
+?>
+            <tr>
+                <td scope="row" >
+                    <input name="smbd_cats[]" value = "<?php echo $category->cat_ID; ?>" type = "checkbox" >
+                </td>
+                <td>
+                    <label for="smbd_cats"><?php echo $category->cat_name; ?> (<?php echo $category->count . " "; _e( 'Posts', 'bulk-delete' ); ?>)</label>
                 </td>
             </tr>
 <?php
@@ -156,7 +186,9 @@ class Bulk_Delete_Posts {
                     <label for="smbd_cats_all"><?php _e("All Categories", 'bulk-delete') ?></label>
                 </td>
             </tr>
+        </table>
 
+        <table class="optiontable">
             <tr>
                 <td colspan="2">
                     <h4><?php _e("Choose your filtering options", 'bulk-delete'); ?></h4>
@@ -368,7 +400,13 @@ class Bulk_Delete_Posts {
             return;
         }
 
-        $terms_array = array();
+        $types =  get_post_types( array(
+            'public'   => true,
+            '_builtin' => false
+            ), 'names'
+        );
+
+        array_unshift( $types, 'post' );
 
         $taxs =  get_taxonomies(array(
             'public'   => true,
@@ -376,6 +414,7 @@ class Bulk_Delete_Posts {
             ), 'objects'
         );
 
+        $terms_array = array();
         if (count($taxs) > 0) {
             foreach ($taxs as $tax) {
                 $terms = get_terms($tax->name);
@@ -387,10 +426,29 @@ class Bulk_Delete_Posts {
 
         if ( count( $terms_array ) > 0 ) {
 ?>
-            <!-- Custom tax Start-->
+        <!-- Custom tax Start-->
+        <h4><?php _e( 'Select the post type whose taxonomy posts you want to delete', 'bulk-delete' ); ?></h4>
+
+        <fieldset class="options">
+            <table class="optiontable">
+<?php
+            foreach ( $types as $type ) {
+?>
+            <tr>
+                <td scope="row" >
+                <input name="smbd_tax_post_type" value = "<?php echo $type; ?>" type = "radio"  class = "smbd_tax_post_type" <?php checked( $type, 'post' ); ?>>
+                </td>
+                <td>
+                    <label for="smbd_tax_post_type"><?php echo $type; ?> </label>
+                </td>
+            </tr>
+<?php
+            }
+?>
+            </table>
+
             <h4><?php _e("Select the taxonomies whose post you want to delete", 'bulk-delete') ?></h4>
 
-            <fieldset class="options">
             <table class="optiontable">
 <?php
             foreach ($terms_array as $tax => $terms) {
@@ -409,6 +467,7 @@ class Bulk_Delete_Posts {
             </table>
 
             <h4><?php _e("The selected taxonomy has the following terms. Select the terms whose post you want to delete", 'bulk-delete') ?></h4>
+            <p><?php _e( 'Note: The post count below for each term is the total number of posts in that term, irrespective of post type', 'bulk-delete' ); ?></p>
 <?php
             foreach ($terms_array as $tax => $terms) {
 ?>
@@ -431,7 +490,6 @@ class Bulk_Delete_Posts {
 <?php
             }
 ?>
-            </table>
             <table class="optiontable">
                 <tr>
                     <td colspan="2">
@@ -863,7 +921,7 @@ class Bulk_Delete_Posts {
         <p>
             <span class = "bd-post-status-pro" style = "color:red">
                 <?php _e( 'You need "Bulk Delete by Custom Field" Addon, to delete post by custom field.', 'bulk-delete'); ?>
-                <a href = "http://sudarmuthu.com/wordpress/pro-addons">Buy now</a>
+                <a href = "http://sudarmuthu.com/wordpress/bulk-delete/pro-addons#bulk-delete-by-custom-field">Buy now</a>
             </span>
         </p>
         <!-- Custom Field box end-->
