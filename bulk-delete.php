@@ -5,7 +5,7 @@ Plugin Script: bulk-delete.php
 Plugin URI: http://sudarmuthu.com/wordpress/bulk-delete
 Description: Bulk delete users and posts from selected categories, tags, post types, custom taxonomies or by post status like drafts, scheduled posts, revisions etc.
 Donate Link: http://sudarmuthu.com/if-you-wanna-thank-me
-Version: 4.2.2
+Version: 4.3
 License: GPL
 Author: Sudar
 Author URI: http://sudarmuthu.com/
@@ -53,7 +53,7 @@ if ( !function_exists( 'array_get' ) ) {
  */
 class Bulk_Delete {
     
-    const VERSION               = '4.2.2';
+    const VERSION               = '4.3';
 
     // page slugs
     const USERS_PAGE_SLUG       = 'bulk-delete-users';
@@ -490,6 +490,7 @@ class Bulk_Delete {
                     // delete by cats
 
                     $delete_options = array();
+                    $delete_options['post_type']     = array_get( $_POST, 'smbd_cat_post_type', 'post' );
                     $delete_options['selected_cats'] = array_get($_POST, 'smbd_cats');
                     $delete_options['restrict']      = array_get($_POST, 'smbd_cats_restrict', FALSE);
                     $delete_options['private']       = array_get($_POST, 'smbd_cats_private');
@@ -553,6 +554,7 @@ class Bulk_Delete {
                     // delete by taxs
                     
                     $delete_options = array();
+                    $delete_options['post_type']          = array_get( $_POST, 'smbd_tax_post_type', 'post' );
                     $delete_options['selected_taxs']      = array_get($_POST, 'smbd_taxs');
                     $delete_options['selected_tax_terms'] = array_get($_POST, 'smbd_tax_terms');
                     $delete_options['restrict']           = array_get($_POST, 'smbd_taxs_restrict', FALSE);
@@ -773,22 +775,27 @@ class Bulk_Delete {
      */
     static function delete_cats($delete_options) {
 
+        // For compatibility reasons set default post type to 'post'
+        $post_type     = array_get( $delete_options, 'post_type', 'post' );
         $selected_cats = $delete_options['selected_cats'];
+
+        $options = array( 
+            'post_type'    => $post_type,
+            'category__in' => $selected_cats,
+            'post_status'  => 'publish',
+            'nopaging'     => 'true'
+        );
 
         $private = $delete_options['private'];
 
         if ($private == 'true') {
-            $options = array('category__in'=>$selected_cats,'post_status'=>'private', 'post_type'=>'post');
-        } else {
-            $options = array('category__in'=>$selected_cats,'post_status'=>'publish', 'post_type'=>'post');
+            $options[ 'post_status' ] = 'private';
         }
 
         $limit_to = $delete_options['limit_to'];
 
         if ($limit_to > 0) {
             $options['showposts'] = $limit_to;
-        } else {
-            $options['nopaging'] = 'true';
         }
 
         $force_delete = $delete_options['force_delete'];
@@ -813,7 +820,12 @@ class Bulk_Delete {
         $posts = $wp_query->query($options);
 
         foreach ($posts as $post) {
-            wp_delete_post($post->ID, $force_delete);
+            // $force delete parameter to custom post types doesn't work
+            if ( $force_delete ) {
+                wp_delete_post( $post->ID );
+            } else {
+                wp_trash_post( $post->ID );
+            }
         }
 
         return count($posts);
@@ -870,17 +882,19 @@ class Bulk_Delete {
     }
 
     /**
-     * Delete posts by custom taxnomomy
+     * Delete posts by custom taxonomy
      */
     static function delete_taxs($delete_options) {
 
-        $selected_taxs = $delete_options['selected_taxs'];
+        // For compatibility reasons set default post type to 'post'
+        $post_type          = array_get( $delete_options, 'post_type', 'post' );
+        $selected_taxs      = $delete_options['selected_taxs'];
         $selected_tax_terms = $delete_options['selected_tax_terms'];
 
         $options = array(
-            'post_status'=>'publish', 
-            'post_type'  =>'post',
-            'tax_query'  => array(
+            'post_status' => 'publish',
+            'post_type'   => $post_type,
+            'tax_query'   => array(
                 array(
                     'taxonomy' => $selected_taxs,
                     'terms'    => $selected_tax_terms,
@@ -925,7 +939,12 @@ class Bulk_Delete {
         $posts = $wp_query->query($options);
 
         foreach ($posts as $post) {
-            wp_delete_post($post->ID, $force_delete);
+            // $force delete parameter to custom post types doesn't work
+            if ( $force_delete ) {
+                wp_delete_post( $post->ID );
+            } else {
+                wp_trash_post( $post->ID );
+            }
         }
 
         return count( $posts );
