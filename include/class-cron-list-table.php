@@ -55,6 +55,13 @@ class Cron_List_Table extends WP_List_Table {
             echo '</li>';
 
             echo '<li>';
+            echo '<strong>', __( 'Delete posts by title', 'bulk-delete' ), '</strong>', ' - ';
+            echo __( 'Adds the ability to delete posts based on title', 'bulk-delete' );
+            echo ' <a href = "http://sudarmuthu.com/wordpress/bulk-delete/pro-addons#bulk-delete-by-title">', __( 'More Info', 'bulk-delete' ), '</a>.';
+            echo ' <a href = "http://sudarmuthu.com/wordpress/bulk-delete/pro-addons#bulk-delete-by-title">', __( 'Buy now', 'bulk-delete' ), '</a>';
+            echo '</li>';
+
+            echo '<li>';
             echo '<strong>', __('Schedule auto delete of Posts by Categories', 'bulk-delete'), '</strong>', ' - ';
             echo __('Adds the ability to schedule auto delete of posts based on categories', 'bulk-delete');
             echo ' <a href = "http://sudarmuthu.com/wordpress/bulk-delete/pro-addons#bulk-delete-schedule-categories">', __('More Info', 'bulk-delete'), '</a>.';
@@ -122,18 +129,20 @@ class Cron_List_Table extends WP_List_Table {
 
 	/**
 	 * Decide which columns to activate the sorting functionality on
+     *
 	 * @return array $sortable, the array of columns that can be sorted by the user
 	 */
 	public function get_sortable_columns() {
 		return $sortable = array(
-			'col_cron_type'=>array('cron_type')
+			'col_cron_type' => array( 'cron_type', true )
 		);
 	}
 
 	/**
 	 * Prepare the table with different parameters, pagination, columns and table elements
 	 */
-	function prepare_items($cron_items) {
+	function prepare_items() {
+        $cron_items = Bulk_Delete_Util::get_cron_schedules();
         $totalitems = count($cron_items);
 
         //How many to display per page?
