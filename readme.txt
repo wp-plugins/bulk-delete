@@ -4,7 +4,7 @@ Tags: post, comment, delete, bulk, mass, draft, revision, page
 Requires at least: 3.3  
 Tested up to: 3.8  
 Donate Link: http://sudarmuthu.com/if-you-wanna-thank-me  
-Stable tag: 4.4  
+Stable tag: 4.4.1  
 
 Bulk delete users based on user role and posts from selected categories, tags, post types, custom taxonomies or by post status like drafts, scheduled posts, revisions etc.
 
@@ -226,6 +226,9 @@ The ability to schedule deletion of posts is available as a pro addon.
 This Readme file was generated using <a href = 'http://sudarmuthu.com/wordpress/wp-readme'>wp-readme</a>, which generates readme files for WordPress Plugins.
 == Changelog ==
 
+= 2013-12-18 - v4.4.1 - (Dev time: 0.5 hours) =
+- Fix: Bulk Delete menu overrides other menus at the same position
+
 = 2013-12-14 - v4.4 - (Dev time: 10 hours) =
 - New: Ability to delete all published posts from "Post Status" module
 - New: Ability to delete all sticky posts from "Post Status" module
@@ -381,6 +384,9 @@ This Readme file was generated using <a href = 'http://sudarmuthu.com/wordpress/
 *   First version
 
 == Upgrade Notice ==
+
+= 4.4.1 =
+Fix: Prevent Bulk Delete from overriding other menus
 
 = 4.2.2 =
 Fix: Bug in deleting custom post types with hypen

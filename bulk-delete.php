@@ -5,7 +5,7 @@ Plugin Script: bulk-delete.php
 Plugin URI: http://sudarmuthu.com/wordpress/bulk-delete
 Description: Bulk delete users and posts from selected categories, tags, post types, custom taxonomies or by post status like drafts, scheduled posts, revisions etc.
 Donate Link: http://sudarmuthu.com/if-you-wanna-thank-me
-Version: 4.4
+Version: 4.4.1
 License: GPL
 Author: Sudar
 Author URI: http://sudarmuthu.com/
@@ -53,7 +53,7 @@ if ( !function_exists( 'array_get' ) ) {
  */
 class Bulk_Delete {
     
-    const VERSION               = '4.4';
+    const VERSION               = '4.4.1';
 
     // page slugs
     const POSTS_PAGE_SLUG       = 'bulk-delete-posts';
@@ -113,7 +113,7 @@ class Bulk_Delete {
      * Add navigation menu
      */
 	function add_menu() {
-        add_menu_page( __( 'Bulk Delete', 'bulk-delete' ) , __( 'Bulk Delete', 'bulk-delete' ), 'manage_options', self::POSTS_PAGE_SLUG, array( &$this, 'display_posts_page' ), 'dashicons-trash', 26 );
+        add_menu_page( __( 'Bulk Delete', 'bulk-delete' ) , __( 'Bulk Delete', 'bulk-delete' ), 'manage_options', self::POSTS_PAGE_SLUG, array( &$this, 'display_posts_page' ), 'dashicons-trash', '26.9966' );
 
         $this->admin_page = add_submenu_page( self::POSTS_PAGE_SLUG, __( 'Bulk Delete Posts', 'bulk-delete' ), __( 'Bulk Delete Posts', 'bulk-delete' ), 'delete_posts', self::POSTS_PAGE_SLUG, array( &$this, 'display_posts_page' ) );
         $this->users_page = add_submenu_page( self::POSTS_PAGE_SLUG, __( 'Bulk Delete Users', 'bulk-delete' ), __( 'Bulk Delete Users', 'bulk-delete' ), 'delete_users', self::USERS_PAGE_SLUG, array( &$this, 'display_users_page' ) );
