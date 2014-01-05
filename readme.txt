@@ -1,10 +1,10 @@
 === Bulk Delete ===
 Contributors: sudar  
 Tags: post, comment, delete, bulk, mass, draft, revision, page  
-Requires at least: 3.3  
+Requires at least: 3.8  
 Tested up to: 3.8  
 Donate Link: http://sudarmuthu.com/if-you-wanna-thank-me  
-Stable tag: 4.4.1  
+Stable tag: 4.4.2  
 
 Bulk delete users based on user role and posts from selected categories, tags, post types, custom taxonomies or by post status like drafts, scheduled posts, revisions etc.
 
@@ -225,6 +225,11 @@ The ability to schedule deletion of posts is available as a pro addon.
 
 This Readme file was generated using <a href = 'http://sudarmuthu.com/wordpress/wp-readme'>wp-readme</a>, which generates readme files for WordPress Plugins.
 == Changelog ==
+
+= 2014-01-05 - v4.4.2 - (Dev time: 1.5 hours) =
+- Fix: Deleting first x posts deletes all posts while deleting by category (#44)
+- Fix: Posts are moved to trash even if "Delete permanently" option is selected (#45)
+- Tweak: Move request processing code for deleting by custom field to addon
 
 = 2013-12-18 - v4.4.1 - (Dev time: 0.5 hours) =
 - Fix: Bulk Delete menu overrides other menus at the same position

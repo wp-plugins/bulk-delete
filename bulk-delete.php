@@ -5,7 +5,7 @@ Plugin Script: bulk-delete.php
 Plugin URI: http://sudarmuthu.com/wordpress/bulk-delete
 Description: Bulk delete users and posts from selected categories, tags, post types, custom taxonomies or by post status like drafts, scheduled posts, revisions etc.
 Donate Link: http://sudarmuthu.com/if-you-wanna-thank-me
-Version: 4.4.1
+Version: 4.4.2
 License: GPL
 Author: Sudar
 Author URI: http://sudarmuthu.com/
@@ -53,7 +53,7 @@ if ( !function_exists( 'array_get' ) ) {
  */
 class Bulk_Delete {
     
-    const VERSION               = '4.4.1';
+    const VERSION               = '4.4.2';
 
     // page slugs
     const POSTS_PAGE_SLUG       = 'bulk-delete-posts';
@@ -724,41 +724,17 @@ class Bulk_Delete {
 
                 case "bulk-delete-cf":
                     // delete by custom field
+                    // TODO: Handle this using filters
 
                     if ( class_exists( 'Bulk_Delete_Custom_Field' ) ) {
-                        $delete_options = array();
-                        $delete_options['cf_key']        = array_get($_POST, 'smbd_cf_key');
-                        $delete_options['cf_field_op']   = array_get($_POST, 'smbd_cf_field_op');
-                        $delete_options['cf_value']      = array_get($_POST, 'smbd_cf_value');
-                        $delete_options['restrict']      = array_get($_POST, 'smbd_cf_restrict', FALSE);
-                        $delete_options['private']       = array_get($_POST, 'smbd_cf_private');
-                        $delete_options['limit_to']      = absint(array_get($_POST, 'smbd_cf_limit_to', 0));
-                        $delete_options['force_delete']  = array_get($_POST, 'smbd_cf_force_delete', 'false');
-
-                        $delete_options['cf_op']         = array_get($_POST, 'smbd_cf_op');
-                        $delete_options['cf_days']       = array_get($_POST, 'smbd_cf_days');
-                        
-                        if (array_get($_POST, 'smbd_cf_cron', 'false') == 'true') {
-                            $freq = $_POST['smbd_cf_cron_freq'];
-                            $time = strtotime($_POST['smbd_cf_cron_start']) - ( get_option('gmt_offset') * 60 * 60 );
-
-                            if ($freq == -1) {
-                                wp_schedule_single_event($time, self::CRON_HOOK_CUSTOM_FIELD, array($delete_options));
-                            } else {
-                                wp_schedule_event($time, $freq , self::CRON_HOOK_CUSTOM_FIELD, array($delete_options));
-                            }
-
-                            $this->msg = __( 'Posts matching the selected custom field setting are scheduled for deletion.', 'bulk-delete' ) . ' ' . 
-                                sprintf( __( 'See the full list of <a href = "%s">scheduled tasks</a>' , 'bulk-delete' ), get_bloginfo( "wpurl" ) . '/wp-admin/admin.php?page=' . self::CRON_PAGE_SLUG );
-                        } else {
-                            $deleted_count = Bulk_Delete_Custom_Field::delete_custom_field( $delete_options );
-                            $this->msg = sprintf( _n( 'Deleted %d post using the selected custom field condition', 'Deleted %d posts using the selected custom field condition' , $deleted_count, 'bulk-delete' ), $deleted_count );
-                        }
+                        $this->msg = Bulk_Delete_Custom_Field::process_request();
                     } 
                     break;
 
                 case "bulk-delete-by-title":
                     // delete by title
+                    // TODO: Move this logic to Bulk Delete By Title addon
+                    // TODO: Handle this using filters
 
                     if ( class_exists( 'Bulk_Delete_By_Title' ) ) {
                         $delete_options                   = array();
@@ -823,8 +799,7 @@ class Bulk_Delete {
         $options = array( 
             'post_type'    => $post_type,
             'category__in' => $selected_cats,
-            'post_status'  => 'publish',
-            'nopaging'     => 'true'
+            'post_status'  => 'publish'
         );
 
         $private = $delete_options['private'];
@@ -837,6 +812,8 @@ class Bulk_Delete {
 
         if ($limit_to > 0) {
             $options['showposts'] = $limit_to;
+        } else {
+            $options['nopaging']  = 'true';
         }
 
         $force_delete = $delete_options['force_delete'];
@@ -863,7 +840,7 @@ class Bulk_Delete {
         foreach ($posts as $post) {
             // $force delete parameter to custom post types doesn't work
             if ( $force_delete ) {
-                wp_delete_post( $post->ID );
+                wp_delete_post( $post->ID, TRUE );
             } else {
                 wp_trash_post( $post->ID );
             }
@@ -982,7 +959,7 @@ class Bulk_Delete {
         foreach ($posts as $post) {
             // $force delete parameter to custom post types doesn't work
             if ( $force_delete ) {
-                wp_delete_post( $post->ID );
+                wp_delete_post( $post->ID, TRUE );
             } else {
                 wp_trash_post( $post->ID );
             }
@@ -1046,7 +1023,7 @@ class Bulk_Delete {
             foreach ( $posts as $post ) {
                 // $force delete parameter to custom post types doesn't work
                 if ( $force_delete ) {
-                    wp_delete_post( $post->ID );
+                    wp_delete_post( $post->ID, TRUE );
                 } else {
                     wp_trash_post( $post->ID );
                 }
