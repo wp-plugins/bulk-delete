@@ -2,9 +2,9 @@
 Contributors: sudar  
 Tags: post, comment, delete, bulk, mass, draft, revision, page  
 Requires at least: 3.8  
-Tested up to: 3.8  
+Tested up to: 3.8.1  
 Donate Link: http://sudarmuthu.com/if-you-wanna-thank-me  
-Stable tag: 4.4.2  
+Stable tag: 4.4.3  
 
 Bulk delete users based on user role and posts from selected categories, tags, post types, custom taxonomies or by post status like drafts, scheduled posts, revisions etc.
 
@@ -225,6 +225,10 @@ The ability to schedule deletion of posts is available as a pro addon.
 
 This Readme file was generated using <a href = 'http://sudarmuthu.com/wordpress/wp-readme'>wp-readme</a>, which generates readme files for WordPress Plugins.
 == Changelog ==
+
+= 2014-01-26 - v4.4.3 - (Dev time: 1.5 hours) =
+- Tweak: Ability to delete posts from non-public post types as well
+- Fix: Fix the height of the sidebar
 
 = 2014-01-05 - v4.4.2 - (Dev time: 1.5 hours) =
 - Fix: Deleting first x posts deletes all posts while deleting by category (#44)

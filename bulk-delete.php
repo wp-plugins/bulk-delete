@@ -5,7 +5,7 @@ Plugin Script: bulk-delete.php
 Plugin URI: http://sudarmuthu.com/wordpress/bulk-delete
 Description: Bulk delete users and posts from selected categories, tags, post types, custom taxonomies or by post status like drafts, scheduled posts, revisions etc.
 Donate Link: http://sudarmuthu.com/if-you-wanna-thank-me
-Version: 4.4.2
+Version: 4.4.3
 License: GPL
 Author: Sudar
 Author URI: http://sudarmuthu.com/
@@ -53,7 +53,7 @@ if ( !function_exists( 'array_get' ) ) {
  */
 class Bulk_Delete {
     
-    const VERSION               = '4.4.2';
+    const VERSION               = '4.4.3';
 
     // page slugs
     const POSTS_PAGE_SLUG       = 'bulk-delete-posts';
@@ -328,11 +328,10 @@ class Bulk_Delete {
             </div><!-- #post-body-content -->
 
             <div id="postbox-container-1" class="postbox-container">
-                <iframe frameBorder="0" height = "1000" src = "http://sudarmuthu.com/projects/wordpress/bulk-delete/sidebar.php?color=<?php echo get_user_option('admin_color'); ?>&version=<?php echo self::VERSION; ?>"></iframe>
+                <iframe frameBorder="0" height = "1300" src = "http://sudarmuthu.com/projects/wordpress/bulk-delete/sidebar.php?color=<?php echo get_user_option( 'admin_color' ); ?>&version=<?php echo self::VERSION; ?>"></iframe>
             </div>
 
             <div id="postbox-container-2" class="postbox-container">
-                <?php //do_meta_boxes( '', 'normal', null ); ?>
                 <?php do_meta_boxes( '', 'advanced', null ); ?>
             </div> <!-- #postbox-container-2 -->
 
@@ -381,7 +380,7 @@ class Bulk_Delete {
             </div><!-- #post-body-content -->
 
             <div id="postbox-container-1" class="postbox-container">
-                <iframe frameBorder="0" height = "1000" src = "http://sudarmuthu.com/projects/wordpress/bulk-delete/sidebar.php?color=<?php echo get_user_option('admin_color'); ?>&version=<?php echo self::VERSION; ?>"></iframe>
+                <iframe frameBorder="0" height = "1300" src = "http://sudarmuthu.com/projects/wordpress/bulk-delete/sidebar.php?color=<?php echo get_user_option( 'admin_color' ); ?>&version=<?php echo self::VERSION; ?>"></iframe>
             </div>
 
             <div id="postbox-container-2" class="postbox-container">
