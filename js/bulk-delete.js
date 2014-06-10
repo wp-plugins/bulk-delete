@@ -4,7 +4,7 @@
  * http://sudarmuthu.com/wordpress/bulk-delete
  *
  * @author: Sudar <http://sudarmuthu.com>
- * 
+ *
  */
 
 /*jslint browser: true, devel: true*/
@@ -47,7 +47,7 @@ jQuery(document).ready(function () {
     // for post boxes
     postboxes.add_postbox_toggles(pagenow);
 
-    jQuery.each(['_cats', '_tags', '_taxs', '_pages', '_post_status', '_types', '_cf', '_title', 'u_userrole'], function (index, value) {
+    jQuery.each(['_cats', '_tags', '_taxs', '_pages', '_post_status', '_types', '_cf', '_title', '_dup_title', 'u_userrole'], function (index, value) {
         // invoke the date time picker
         jQuery('#smbd' + value + '_cron_start').datetimepicker({
             timeFormat: 'HH:mm:ss'
@@ -87,7 +87,7 @@ jQuery(document).ready(function () {
                 // not valid
                 alert(BULK_DELETE.error.enterurl);
             }
-        } else if (jQuery(this).val() === 'bulk-delete-cf') {
+        } else if (jQuery(this).val() === 'delete_posts_by_custom_field') {
             if (jQuery('#smbd_cf_key').val() !== '') {
                 valid = true;
             } else {
@@ -95,7 +95,7 @@ jQuery(document).ready(function () {
                 alert(BULK_DELETE.error.enter_cf_key);
             }
 
-        } else if (jQuery(this).val() === 'bulk-delete-by-title') {
+        } else if (jQuery(this).val() === 'delete_posts_by_title') {
 
             if (jQuery('#smbd_title_value').val() !== '') {
                 valid = true;
@@ -104,6 +104,9 @@ jQuery(document).ready(function () {
                 alert(BULK_DELETE.error.enter_title);
             }
 
+        } else if (jQuery(this).val() === 'delete_posts_by_duplicate_title') {
+            // nothing to check for duplicate title
+            valid = true;
         } else {
             if (jQuery(this).parent().prev().children('table').find(":checkbox:checked[value!='true']").size() > 0) {
                 // monstrous selector
@@ -115,7 +118,7 @@ jQuery(document).ready(function () {
         }
 
         if (valid) {
-            if (current_button.lastIndexOf('bulk-delete-users-', 0) === 0) {
+            if (current_button.lastIndexOf('delete_users_by_role', 0) === 0) {
                 return confirm(BULK_DELETE.msg.deletewarningusers);
             } else {
                 return confirm(BULK_DELETE.msg.deletewarning);
