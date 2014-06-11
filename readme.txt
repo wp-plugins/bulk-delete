@@ -4,7 +4,7 @@ Tags: post, comment, delete, bulk, mass, draft, revision, page
 Requires at least: 3.8  
 Tested up to: 3.9.1  
 Donate Link: http://sudarmuthu.com/if-you-wanna-thank-me  
-Stable tag: 5.0  
+Stable tag: 5.0.1  
 
 Bulk delete posts, pages or users in bulk based on different conditions and filters.
 
@@ -241,7 +241,10 @@ You can contact us by posting about it in our [support forum](http://bulkwp.com/
 This Readme file was generated using <a href = 'http://sudarmuthu.com/wordpress/wp-readme'>wp-readme</a>, which generates readme files for WordPress Plugins.
 == Changelog ==
 
-= 2014-04-26 - v5.0 - (Dev time: 30 hours) =
+= 2014-04-26 - v5.0.1 - (Dev time: 1 hours) =
+- Fix: Deleting users had as issue that was introduced in v5.0
+
+= 2014-06-10 - v5.0 - (Dev time: 60 hours) =
 - New: Add the ability to delete posts by duplicate title (#56)
 - Tweak: Make Bulk_Delete class singleton
 - Tweak: Move all deprecated functions and code to a separate file
@@ -422,6 +425,9 @@ This Readme file was generated using <a href = 'http://sudarmuthu.com/wordpress/
 *   First version
 
 == Upgrade Notice ==
+
+= 5.0.1 =
+Fix delete users. Note: This version is only compatible with addons above v0.5
 
 = 5.0 =
 This version is only compatible with addons above v0.5
