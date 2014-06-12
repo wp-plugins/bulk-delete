@@ -120,7 +120,7 @@ class Bulk_Delete_Pages {
         }
 ?>
                     </select>
-                    <span class = "bd-pages-pro" style = "color:red"><?php _e('Only available in Pro Addon', 'bulk-delete'); ?> <a href = "http://bulkwp.com/addons/scheduler-for-deleting-pages-by-status/">Buy now</a></span>
+                    <span class = "bd-pages-pro" style = "color:red"><?php _e('Only available in Pro Addon', 'bulk-delete'); ?> <a href = "http://bulkwp.com/addons/scheduler-for-deleting-pages-by-status/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow">Buy now</a></span>
                 </td>
             </tr>
         </table>
@@ -238,7 +238,7 @@ class Bulk_Delete_Pages {
             $options['days'] = $delete_options['page_days'];
 
             if ( !class_exists( 'Bulk_Delete_By_Days' ) ) {
-                require_once $bd::$PLUGIN_DIR . '/include/class-bulk-delete-by-days.php';
+                require_once Bulk_Delete::$PLUGIN_DIR . '/include/class-bulk-delete-by-days.php';
             }
             $bulk_Delete_By_Days = new Bulk_Delete_By_Days;
         }
