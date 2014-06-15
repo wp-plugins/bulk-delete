@@ -33,7 +33,6 @@ class Bulk_Delete_System_Info {
      */
     public static function display_system_info() {
         global $wpdb;
-        $bd = BULK_DELETE();
 
         if ( ! class_exists( 'Browser' ) ) {
             require_once Bulk_Delete::$PLUGIN_DIR . 'include/libraries/browser.php';
@@ -58,7 +57,7 @@ class Bulk_Delete_System_Info {
 ?>
     <div class="wrap">
         <h2><?php _e( 'System Information', 'bulk-delete' ); ?></h2><br/>
-        <form action="<?php echo esc_url( admin_url( 'admin.php?page=' . $bd::INFO_PAGE_SLUG ) ); ?>" method="post" dir="ltr">
+        <form action="<?php echo esc_url( admin_url( 'admin.php?page=' . Bulk_Delete::INFO_PAGE_SLUG ) ); ?>" method="post" dir="ltr">
             <textarea style="width:800px;height:400px;font-family:Menlo,Monaco,monospace;white-space:pre;" readonly="readonly" onclick="this.focus();this.select()" id="system-info-textarea" name="bulk-delete-sysinfo" title="<?php _e( 'To copy the system info, click below then press Ctrl + C (PC) or Cmd + C (Mac).', 'bulk-delete' ); ?>">
 ### Begin System Info ###
 
@@ -73,7 +72,7 @@ Multisite:                <?php echo is_multisite() ? 'Yes' . "\n" : 'No' . "\n"
 SITE_URL:                 <?php echo site_url() . "\n"; ?>
 HOME_URL:                 <?php echo home_url() . "\n"; ?>
 
-Bulk Delete Version:      <?php echo $bd::VERSION . "\n"; ?>
+Bulk Delete Version:      <?php echo Bulk_Delete::VERSION . "\n"; ?>
 Upgraded From:            <?php echo get_option( 'bulk-delete_version_upgraded_from', 'None' ) . "\n"; ?>
 WordPress Version:        <?php echo get_bloginfo( 'version' ) . "\n"; ?>
 Permalink Structure:      <?php echo get_option( 'permalink_structure' ) . "\n"; ?>
@@ -102,6 +101,8 @@ PHP Arg Separator:        <?php echo ini_get( 'arg_separator.output' ) . "\n"; ?
 PHP Allow URL File Open:  <?php echo ini_get( 'allow_url_fopen' ) ? "Yes" : "No\n"; ?>
 
 WP_DEBUG:                 <?php echo defined( 'WP_DEBUG' ) ? WP_DEBUG ? 'Enabled' . "\n" : 'Disabled' . "\n" : 'Not set' . "\n" ?>
+
+EMPTY_TRASH_DAYS:         <?php echo defined( 'EMPTY_TRASH_DAYS' ) ? EMPTY_TRASH_DAYS : 'Not set' . "\n" ?>
 
 WP Table Prefix:          <?php echo "Length: ". strlen( $wpdb->prefix ); echo " Status:"; if ( strlen( $wpdb->prefix )>16 ) {echo " ERROR: Too Long";} else {echo " Acceptable";} echo "\n"; ?>
 

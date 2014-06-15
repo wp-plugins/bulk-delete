@@ -5,7 +5,7 @@ Plugin Script: bulk-delete.php
 Plugin URI: http://bulkwp.com
 Description: Bulk delete users and posts from selected categories, tags, post types, custom taxonomies or by post status like drafts, scheduled posts, revisions etc.
 Donate Link: http://sudarmuthu.com/if-you-wanna-thank-me
-Version: 5.0.2
+Version: 5.1
 License: GPL
 Author: Sudar
 Author URI: http://sudarmuthu.com/
@@ -36,7 +36,7 @@ Check readme file for full release notes
  * @package    Bulk_Delete
  * @subpackage core
  * @author     Sudar
- * @version    5.0.2
+ * @version    5.1
  */
 
 // Exit if accessed directly
@@ -56,7 +56,7 @@ final class Bulk_Delete {
      */
     private static $instance;
 
-    const VERSION                   = '5.0.2';
+    const VERSION                   = '5.1';
 
     // page slugs
     const POSTS_PAGE_SLUG           = 'bulk-delete-posts';
@@ -95,9 +95,11 @@ final class Bulk_Delete {
     const BOX_CUSTOM_FIELD          = 'bd_by_custom_field';
     const BOX_TITLE                 = 'bd_by_title';
     const BOX_DUPLICATE_TITLE       = 'bd_by_duplicate_title';
+    const BOX_POST_FROM_TRASH       = 'bd_posts_from_trash';
 
     // meta boxes for delete pages
     const BOX_PAGE_STATUS           = 'bd_by_page_status';
+    const BOX_PAGE_FROM_TRASH       = 'bd_pages_from_trash';
 
     // meta boxes for delete users
     const BOX_USERS                 = 'bdu_by_users';
@@ -206,6 +208,7 @@ final class Bulk_Delete {
         require_once self::$PLUGIN_DIR . '/include/class-bd-edd-api-wrapper.php';
         require_once self::$PLUGIN_DIR . '/include/class-bd-settings.php';
         require_once self::$PLUGIN_DIR . '/include/admin-ui.php';
+        require_once self::$PLUGIN_DIR . '/include/class-bulk-delete-help-screen.php';
     }
 
     /**
@@ -237,12 +240,12 @@ final class Bulk_Delete {
 	function add_menu() {
         add_menu_page( __( 'Bulk Delete', 'bulk-delete' ) , __( 'Bulk Delete', 'bulk-delete' ), 'manage_options', self::POSTS_PAGE_SLUG, array( &$this, 'display_posts_page' ), 'dashicons-trash', '26.9966' );
 
-        $this->posts_page = add_submenu_page( self::POSTS_PAGE_SLUG, __( 'Bulk Delete Posts', 'bulk-delete' ), __( 'Bulk Delete Posts', 'bulk-delete' ), 'delete_posts', self::POSTS_PAGE_SLUG, array( &$this, 'display_posts_page' ) );
-        $this->pages_page = add_submenu_page( self::POSTS_PAGE_SLUG, __( 'Bulk Delete Pages', 'bulk-delete' ), __( 'Bulk Delete Pages', 'bulk-delete' ), 'delete_pages', self::PAGES_PAGE_SLUG, array( &$this, 'display_pages_page' ) );
-        $this->users_page = add_submenu_page( self::POSTS_PAGE_SLUG, __( 'Bulk Delete Users', 'bulk-delete' ), __( 'Bulk Delete Users', 'bulk-delete' ), 'delete_users', self::USERS_PAGE_SLUG, array( &$this, 'display_users_page' ) );
-        $this->cron_page  = add_submenu_page( self::POSTS_PAGE_SLUG, __( 'Bulk Delete Schedules', 'bulk-delete' ), __( 'Schedules', 'bulk-delete' ), 'delete_posts', self::CRON_PAGE_SLUG, array( &$this, 'display_cron_page' ) );
-        $this->addon_page = add_submenu_page( self::POSTS_PAGE_SLUG, __( 'Addon Licenses', 'bulk-delete' ), __( 'Addon Licenses', 'bulk-delete' ), 'activate_plugins', self::ADDON_PAGE_SLUG, array( 'BD_License', 'display_addon_page' ) );
-        $this->info_page  = add_submenu_page( self::POSTS_PAGE_SLUG, __( 'Bulk Delete System Info', 'bulk-delete' ), __( 'System Info', 'bulk-delete' ), 'manage_options', self::INFO_PAGE_SLUG, array( 'Bulk_Delete_System_Info', 'display_system_info' ) );
+        $this->posts_page = add_submenu_page( self::POSTS_PAGE_SLUG , __( 'Bulk Delete Posts'       , 'bulk-delete' ) , __( 'Bulk Delete Posts' , 'bulk-delete' ) , 'delete_posts'     , self::POSTS_PAGE_SLUG , array( &$this                    , 'display_posts_page' ) );
+        $this->pages_page = add_submenu_page( self::POSTS_PAGE_SLUG , __( 'Bulk Delete Pages'       , 'bulk-delete' ) , __( 'Bulk Delete Pages' , 'bulk-delete' ) , 'delete_pages'     , self::PAGES_PAGE_SLUG , array( &$this                    , 'display_pages_page' ) );
+        $this->users_page = add_submenu_page( self::POSTS_PAGE_SLUG , __( 'Bulk Delete Users'       , 'bulk-delete' ) , __( 'Bulk Delete Users' , 'bulk-delete' ) , 'delete_users'     , self::USERS_PAGE_SLUG , array( &$this                    , 'display_users_page' ) );
+        $this->cron_page  = add_submenu_page( self::POSTS_PAGE_SLUG , __( 'Bulk Delete Schedules'   , 'bulk-delete' ) , __( 'Schedules'         , 'bulk-delete' ) , 'delete_posts'     , self::CRON_PAGE_SLUG  , array( &$this                    , 'display_cron_page' ) );
+        $this->addon_page = add_submenu_page( self::POSTS_PAGE_SLUG , __( 'Addon Licenses'          , 'bulk-delete' ) , __( 'Addon Licenses'    , 'bulk-delete' ) , 'activate_plugins' , self::ADDON_PAGE_SLUG , array( 'BD_License'              , 'display_addon_page' ) );
+        $this->info_page  = add_submenu_page( self::POSTS_PAGE_SLUG , __( 'Bulk Delete System Info' , 'bulk-delete' ) , __( 'System Info'       , 'bulk-delete' ) , 'manage_options'   , self::INFO_PAGE_SLUG  , array( 'Bulk_Delete_System_Info' , 'display_system_info' ) );
 
         // enqueue JavaScript
         add_action( 'admin_print_scripts-' . $this->posts_page, array( &$this, 'add_script') );
@@ -268,30 +271,11 @@ final class Bulk_Delete {
     function add_delete_posts_settings_panel() {
 
         /**
-         * Create the WP_Screen object using page handle
+         * Add contextual help for admin screens
+         *
+         * @since 5.1
          */
-        $this->delete_posts_screen = WP_Screen::get($this->posts_page);
-
-        /**
-         * Content specified inline
-         */
-        $this->delete_posts_screen->add_help_tab(
-            array(
-                'title'    => __('About Plugin', 'bulk-delete'),
-                'id'       => 'about_tab',
-                'content'  => '<p>' . __('This plugin allows you to delete posts in bulk from selected categories, tags, custom taxonomies or by post status like drafts, pending posts, scheduled posts etc.', 'bulk-delete') . '</p>',
-                'callback' => false
-            )
-        );
-
-        // Add help sidebar
-        $this->delete_posts_screen->set_help_sidebar(
-            '<p><strong>' . __('More information', 'bulk-delete') . '</strong></p>' .
-            '<p><a href = "http://sudarmuthu.com/wordpress/bulk-delete">' . __('Plugin Homepage/support', 'bulk-delete') . '</a></p>' .
-            '<p><a href = "http://sudarmuthu.com/wordpress/bulk-delete/pro-addons">' . __("Buy pro addons", 'bulk-delete') . '</a></p>' .
-            '<p><a href = "http://sudarmuthu.com/blog">' . __("Plugin author's blog", 'bulk-delete') . '</a></p>' .
-            '<p><a href = "http://sudarmuthu.com/wordpress/">' . __("Other Plugin's by Author", 'bulk-delete') . '</a></p>'
-        );
+        do_action( 'bd_add_contextual_help', $this->posts_page );
 
         /* Trigger the add_meta_boxes hooks to allow meta boxes to be added */
         do_action('add_meta_boxes_' . $this->posts_page, null);
@@ -305,16 +289,17 @@ final class Bulk_Delete {
      * Register meta boxes for delete posts page
      */
     function add_delete_posts_meta_boxes() {
-        add_meta_box( self::BOX_POST_STATUS, __( 'By Post Status', 'bulk-delete' ), 'Bulk_Delete_Posts::render_delete_posts_by_status_box', $this->posts_page, 'advanced' );
-        add_meta_box( self::BOX_CATEGORY, __( 'By Category', 'bulk-delete' ), 'Bulk_Delete_Posts::render_delete_posts_by_category_box', $this->posts_page, 'advanced' );
-        add_meta_box( self::BOX_TAG, __( 'By Tag', 'bulk-delete' ), 'Bulk_Delete_Posts::render_delete_posts_by_tag_box', $this->posts_page, 'advanced' );
-        add_meta_box( self::BOX_TAX, __( 'By Custom Taxonomy', 'bulk-delete' ), 'Bulk_Delete_Posts::render_delete_posts_by_taxonomy_box', $this->posts_page, 'advanced' );
-        add_meta_box( self::BOX_POST_TYPE, __( 'By Custom Post Types', 'bulk-delete' ), 'Bulk_Delete_Posts::render_delete_posts_by_post_type_box', $this->posts_page, 'advanced' );
-        add_meta_box( self::BOX_URL, __( 'By URL', 'bulk-delete' ), 'Bulk_Delete_Posts::render_delete_posts_by_url_box', $this->posts_page, 'advanced' );
-        add_meta_box( self::BOX_POST_REVISION, __( 'By Post Revision', 'bulk-delete' ), 'Bulk_Delete_Posts::render_posts_by_revision_box', $this->posts_page, 'advanced' );
-        add_meta_box( self::BOX_CUSTOM_FIELD, __( 'By Custom Field', 'bulk-delete' ), 'Bulk_Delete_Posts::render_delete_posts_by_custom_field_box', $this->posts_page, 'advanced' );
-        add_meta_box( self::BOX_TITLE, __( 'By Title', 'bulk-delete' ), 'Bulk_Delete_Posts::render_delete_posts_by_title_box', $this->posts_page, 'advanced' );
-        add_meta_box( self::BOX_DUPLICATE_TITLE, __( 'By Duplicate Title', 'bulk-delete' ), 'Bulk_Delete_Posts::render_delete_posts_by_duplicate_title_box', $this->posts_page, 'advanced' );
+        add_meta_box( self::BOX_POST_STATUS     , __( 'By Post Status'       , 'bulk-delete' ) , 'Bulk_Delete_Posts::render_delete_posts_by_status_box'          , $this->posts_page , 'advanced' );
+        add_meta_box( self::BOX_CATEGORY        , __( 'By Category'          , 'bulk-delete' ) , 'Bulk_Delete_Posts::render_delete_posts_by_category_box'        , $this->posts_page , 'advanced' );
+        add_meta_box( self::BOX_TAG             , __( 'By Tag'               , 'bulk-delete' ) , 'Bulk_Delete_Posts::render_delete_posts_by_tag_box'             , $this->posts_page , 'advanced' );
+        add_meta_box( self::BOX_TAX             , __( 'By Custom Taxonomy'   , 'bulk-delete' ) , 'Bulk_Delete_Posts::render_delete_posts_by_taxonomy_box'        , $this->posts_page , 'advanced' );
+        add_meta_box( self::BOX_POST_TYPE       , __( 'By Custom Post Types' , 'bulk-delete' ) , 'Bulk_Delete_Posts::render_delete_posts_by_post_type_box'       , $this->posts_page , 'advanced' );
+        add_meta_box( self::BOX_URL             , __( 'By URL'               , 'bulk-delete' ) , 'Bulk_Delete_Posts::render_delete_posts_by_url_box'             , $this->posts_page , 'advanced' );
+        add_meta_box( self::BOX_POST_REVISION   , __( 'By Post Revision'     , 'bulk-delete' ) , 'Bulk_Delete_Posts::render_posts_by_revision_box'               , $this->posts_page , 'advanced' );
+        add_meta_box( self::BOX_CUSTOM_FIELD    , __( 'By Custom Field'      , 'bulk-delete' ) , 'Bulk_Delete_Posts::render_delete_posts_by_custom_field_box'    , $this->posts_page , 'advanced' );
+        add_meta_box( self::BOX_TITLE           , __( 'By Title'             , 'bulk-delete' ) , 'Bulk_Delete_Posts::render_delete_posts_by_title_box'           , $this->posts_page , 'advanced' );
+        add_meta_box( self::BOX_DUPLICATE_TITLE , __( 'By Duplicate Title'   , 'bulk-delete' ) , 'Bulk_Delete_Posts::render_delete_posts_by_duplicate_title_box' , $this->posts_page , 'advanced' );
+        add_meta_box( self::BOX_POST_FROM_TRASH , __( 'Posts in Trash'       , 'bulk-delete' ) , 'Bulk_Delete_Posts::render_delete_posts_from_trash'             , $this->posts_page , 'advanced' );
     }
 
     /**
@@ -325,30 +310,11 @@ final class Bulk_Delete {
     function add_delete_pages_settings_panel() {
 
         /**
-         * Create the WP_Screen object using page handle
+         * Add contextual help for admin screens
+         *
+         * @since 5.1
          */
-        $this->delete_pages_screen = WP_Screen::get( $this->pages_page );
-
-        /**
-         * Content specified inline
-         */
-        $this->delete_pages_screen->add_help_tab(
-            array(
-                'title'    => __('About Plugin', 'bulk-delete'),
-                'id'       => 'about_tab',
-                'content'  => '<p>' . __('This plugin allows you to delete posts in bulk from selected categories, tags, custom taxonomies or by post status like drafts, pending posts, scheduled posts etc.', 'bulk-delete') . '</p>',
-                'callback' => false
-            )
-        );
-
-        // Add help sidebar
-        $this->delete_pages_screen->set_help_sidebar(
-            '<p><strong>' . __('More information', 'bulk-delete') . '</strong></p>' .
-            '<p><a href = "http://sudarmuthu.com/wordpress/bulk-delete">' . __('Plugin Homepage/support', 'bulk-delete') . '</a></p>' .
-            '<p><a href = "http://sudarmuthu.com/wordpress/bulk-delete/pro-addons">' . __("Buy pro addons", 'bulk-delete') . '</a></p>' .
-            '<p><a href = "http://sudarmuthu.com/blog">' . __("Plugin author's blog", 'bulk-delete') . '</a></p>' .
-            '<p><a href = "http://sudarmuthu.com/wordpress/">' . __("Other Plugin's by Author", 'bulk-delete') . '</a></p>'
-        );
+        do_action( 'bd_add_contextual_help', $this->pages_page );
 
         /* Trigger the add_meta_boxes hooks to allow meta boxes to be added */
         do_action('add_meta_boxes_' . $this->pages_page, null);
@@ -364,7 +330,8 @@ final class Bulk_Delete {
      * @since 5.0
      */
     function add_delete_pages_meta_boxes() {
-        add_meta_box( self::BOX_PAGE_STATUS, __( 'By Page status', 'bulk-delete' ), 'Bulk_Delete_Pages::render_delete_pages_by_status_box', $this->pages_page, 'advanced' );
+        add_meta_box( self::BOX_PAGE_STATUS     , __( 'By Page status' , 'bulk-delete' ) , 'Bulk_Delete_Pages::render_delete_pages_by_status_box' , $this->pages_page , 'advanced' );
+        add_meta_box( self::BOX_PAGE_FROM_TRASH , __( 'Pages in Trash' , 'bulk-delete' ) , 'Bulk_Delete_Pages::render_delete_pages_from_trash'    , $this->pages_page , 'advanced' );
     }
 
     /**
@@ -373,30 +340,11 @@ final class Bulk_Delete {
     function add_delete_users_settings_panel() {
 
         /**
-         * Create the WP_Screen object using page handle
+         * Add contextual help for admin screens
+         *
+         * @since 5.1
          */
-        $this->delete_users_screen = WP_Screen::get( $this->users_page );
-
-        /**
-         * Content specified inline
-         */
-        $this->delete_users_screen->add_help_tab(
-            array(
-                'title'    => __('About Plugin', 'bulk-delete'),
-                'id'       => 'about_tab',
-                'content'  => '<p>' . __('This plugin allows you to delete posts in bulk from selected categories, tags, custom taxonomies or by post status like drafts, pending posts, scheduled posts etc.', 'bulk-delete') . '</p>',
-                'callback' => false
-            )
-        );
-
-        // Add help sidebar
-        $this->delete_users_screen->set_help_sidebar(
-            '<p><strong>' . __('More information', 'bulk-delete') . '</strong></p>' .
-            '<p><a href = "http://sudarmuthu.com/wordpress/bulk-delete">' . __('Plugin Homepage/support', 'bulk-delete') . '</a></p>' .
-            '<p><a href = "http://sudarmuthu.com/wordpress/bulk-delete/pro-addons">' . __("Buy pro addons", 'bulk-delete') . '</a></p>' .
-            '<p><a href = "http://sudarmuthu.com/blog">' . __("Plugin author's blog", 'bulk-delete') . '</a></p>' .
-            '<p><a href = "http://sudarmuthu.com/wordpress/">' . __("Other Plugin's by Author", 'bulk-delete') . '</a></p>'
-        );
+        do_action( 'bd_add_contextual_help', $this->users_page );
 
         /* Trigger the add_meta_boxes hooks to allow meta boxes to be added */
         do_action('add_meta_boxes_' . $this->users_page, null);

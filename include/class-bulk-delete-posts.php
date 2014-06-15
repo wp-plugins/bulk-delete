@@ -1360,10 +1360,9 @@ class Bulk_Delete_Posts {
             printf( __( 'This section just got enabled. Kindly <a href = "%1$s">refresh</a> the page to fully enable it.', 'bulk-delete' ), 'admin.php?page=' . Bulk_Delete::POSTS_PAGE_SLUG );
             return;
         }
-
 ?>
         <!-- URLs start-->
-        <h4><?php _e("Delete these specific pages", 'bulk-delete'); ?></h4>
+        <h4><?php _e( 'Delete posts and pages that have the following Permalink', 'bulk-delete' ); ?></h4>
 
         <fieldset class="options">
         <table class="optiontable">
@@ -1599,6 +1598,34 @@ class Bulk_Delete_Posts {
 <?php
         } else {
             Bulk_Delete_Posts_By_Duplicate_Title::render_delete_posts_by_duplicate_title_box();
+        }
+    }
+
+    /**
+     * Render delete posts from trash box
+     *
+     * @since 5.1
+     * @static
+     */
+    public static function render_delete_posts_from_trash() {
+        if ( Bulk_Delete_Util::is_posts_box_hidden( Bulk_Delete::BOX_POST_FROM_TRASH ) ) {
+            printf( __( 'This section just got enabled. Kindly <a href = "%1$s">refresh</a> the page to fully enable it.', 'bulk-delete' ), 'admin.php?page=' . Bulk_Delete::POSTS_PAGE_SLUG );
+            return;
+        }
+
+        if ( !class_exists( 'Bulk_Delete_From_Trash' ) ) {
+?>
+        <!-- Posts In Trash box start-->
+        <p>
+            <span class = "bd-post-trash-pro" style = "color:red">
+                <?php _e( 'You need "Bulk Delete From Trash" Addon, to delete post in Trash.', 'bulk-delete' ); ?>
+                <a href = "http://bulkwp.com/addons/bulk-delete-from-trash/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow">Buy now</a>
+            </span>
+        </p>
+        <!-- Posts In Trash box end-->
+<?php
+        } else {
+            Bulk_Delete_From_Trash::render_delete_posts_from_trash();
         }
     }
 
