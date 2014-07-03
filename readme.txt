@@ -4,7 +4,7 @@ Tags: post, comment, delete, bulk, mass, draft, revision, page
 Requires at least: 3.8  
 Tested up to: 3.9.1  
 Donate Link: http://sudarmuthu.com/if-you-wanna-thank-me  
-Stable tag: 5.1  
+Stable tag: 5.2  
 
 Bulk delete posts, pages or users in bulk based on different conditions and filters.
 
@@ -30,6 +30,7 @@ This Plugin supports the following bulk delete options for deleting posts
 - Delete posts by custom field (Available as a [Pro addon](http://bulkwp.com/addons/bulk-delete-posts-by-custom-field/?utm_source=wprepo&utm_campaign=BulkDelete&utm_medium=readme))
 - Delete posts by title (Available as a [Pro addon](http://bulkwp.com/addons/bulk-delete-posts-by-title/?utm_source=wprepo&utm_campaign=BulkDelete&utm_medium=readme))
 - Delete posts by duplicate title (Available as a [Pro addon](http://bulkwp.com/addons/bulk-delete-posts-by-duplicate-title/?utm_source=wprepo&utm_campaign=BulkDelete&utm_medium=readme))
+- Delete posts by user role (Available as a [Pro addon](http://bulkwp.com/addons/bulk-delete-posts-by-user-role/?utm_source=wprepo&utm_campaign=BulkDelete&utm_medium=readme))
 - Delete all draft posts
 - Delete all pending posts
 - Delete all private posts
@@ -91,6 +92,7 @@ The following are the popular pro addons that are available for purchase. The fu
 - **Delete posts by custom field** - Adds the ability to delete posts based on custom field. [More details](http://bulkwp.com/addons/bulk-delete-posts-by-custom-field/?utm_source=wprepo&utm_campaign=BulkDelete&utm_medium=readme).
 - **Delete posts by title** - Adds the ability to delete posts based on title. [More details](http://bulkwp.com/addons/bulk-delete-posts-by-title/?utm_source=wprepo&utm_campaign=BulkDelete&utm_medium=readme).
 - **Delete posts by duplicate title** - Adds the ability to delete posts based on duplicate title. [More details](http://bulkwp.com/addons/bulk-delete-posts-by-duplicate-title/?utm_source=wprepo&utm_campaign=BulkDelete&utm_medium=readme).
+- **Delete posts by user role** - Adds the ability to delete posts based on user role. [More details](http://bulkwp.com/addons/bulk-delete-posts-by-user-role/?utm_source=wprepo&utm_campaign=BulkDelete&utm_medium=readme).
 - **Delete from trash** - Adds the ability to delete posts and pages from trash. [More details](http://bulkwp.com/addons/bulk-delete-from-trash/?utm_source=wprepo&utm_campaign=BulkDelete&utm_medium=readme).
 - **Scheduler for deleting posts Category** - Adds the ability to schedule auto delete of posts based on category. [More details](http://bulkwp.com/addons/scheduler-for-deleting-posts-by-category/?utm_source=wprepo&utm_campaign=BulkDelete&utm_medium=readme).
 - **Scheduler for deleting posts Tag** - Adds the ability to schedule auto delete of posts based on tag. [More details](http://bulkwp.com/addons/scheduler-for-deleting-posts-by-tag/?utm_source=wprepo&utm_campaign=BulkDelete&utm_medium=readme).
@@ -115,9 +117,9 @@ The following are the features that I am thinking of adding to the Plugin, when 
 - Bulk Delete posts based on page views
 - Bulk delete based on the presence/absence of a word
 - Bulk Delete empty posts
-- Bulk Delete posts based on users
 - Bulk delete comments
 - Delete images that are used by the posts that are being deleted
+- <del>Bulk Delete posts based on users</del> - Added in v5.2
 - <del>Bulk Delete sticky posts</del> - Added in v4.4
 - <del>Change the message based on the option the user has chosen</del> - Added in v3.3
 - <del>Expandable/collapsible taxonomies</del> - Added in v3.3
@@ -243,6 +245,11 @@ You can contact us by posting about it in our [support forum](http://bulkwp.com/
 
 This Readme file was generated using <a href = 'http://sudarmuthu.com/wordpress/wp-readme'>wp-readme</a>, which generates readme files for WordPress Plugins.
 == Changelog ==
+
+= 2014-07-03 - v5.2 - (Dev time: 8 hours) =
+- New: Ability to delete users in batches (Issue #47)
+- New: A new addon to delete posts based on users (Issue #6)
+
 
 = 2014-06-14 - v5.1 - (Dev time: 8 hours) =
 - New: Added the "Delete posts from trash" addon (Issue #65)
@@ -441,6 +448,9 @@ This Readme file was generated using <a href = 'http://sudarmuthu.com/wordpress/
 *   First version
 
 == Upgrade Notice ==
+
+= 5.2 =
+Ability to delete users in batches and a new addon to delete posts based on users
 
 = 5.1 =
 Added the ability to delete posts and pages from trash

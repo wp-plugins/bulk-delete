@@ -5,7 +5,7 @@ Plugin Script: bulk-delete.php
 Plugin URI: http://bulkwp.com
 Description: Bulk delete users and posts from selected categories, tags, post types, custom taxonomies or by post status like drafts, scheduled posts, revisions etc.
 Donate Link: http://sudarmuthu.com/if-you-wanna-thank-me
-Version: 5.1
+Version: 5.2
 License: GPL
 Author: Sudar
 Author URI: http://sudarmuthu.com/
@@ -36,7 +36,7 @@ Check readme file for full release notes
  * @package    Bulk_Delete
  * @subpackage core
  * @author     Sudar
- * @version    5.1
+ * @version    5.2
  */
 
 // Exit if accessed directly
@@ -56,7 +56,7 @@ final class Bulk_Delete {
      */
     private static $instance;
 
-    const VERSION                   = '5.1';
+    const VERSION                   = '5.2';
 
     // page slugs
     const POSTS_PAGE_SLUG           = 'bulk-delete-posts';
@@ -79,6 +79,7 @@ final class Bulk_Delete {
     const CRON_HOOK_CUSTOM_FIELD    = 'do-bulk-delete-custom-field';
     const CRON_HOOK_TITLE           = 'do-bulk-delete-by-title';
     const CRON_HOOK_DUPLICATE_TITLE = 'do-bulk-delete-by-duplicate-title';
+    const CRON_HOOK_POST_BY_ROLE    = 'do-bulk-delete-posts-by-role';
 
     const CRON_HOOK_PAGES_STATUS    = 'do-bulk-delete-pages-by-status';
 
@@ -96,6 +97,7 @@ final class Bulk_Delete {
     const BOX_TITLE                 = 'bd_by_title';
     const BOX_DUPLICATE_TITLE       = 'bd_by_duplicate_title';
     const BOX_POST_FROM_TRASH       = 'bd_posts_from_trash';
+    const BOX_POST_BY_ROLE          = 'bd_post_by_user_role';
 
     // meta boxes for delete pages
     const BOX_PAGE_STATUS           = 'bd_by_page_status';
@@ -299,6 +301,7 @@ final class Bulk_Delete {
         add_meta_box( self::BOX_CUSTOM_FIELD    , __( 'By Custom Field'      , 'bulk-delete' ) , 'Bulk_Delete_Posts::render_delete_posts_by_custom_field_box'    , $this->posts_page , 'advanced' );
         add_meta_box( self::BOX_TITLE           , __( 'By Title'             , 'bulk-delete' ) , 'Bulk_Delete_Posts::render_delete_posts_by_title_box'           , $this->posts_page , 'advanced' );
         add_meta_box( self::BOX_DUPLICATE_TITLE , __( 'By Duplicate Title'   , 'bulk-delete' ) , 'Bulk_Delete_Posts::render_delete_posts_by_duplicate_title_box' , $this->posts_page , 'advanced' );
+        add_meta_box( self::BOX_POST_BY_ROLE    , __( 'By User Role'         , 'bulk-delete' ) , 'Bulk_Delete_Posts::render_delete_posts_by_user_role_box'       , $this->posts_page , 'advanced' );
         add_meta_box( self::BOX_POST_FROM_TRASH , __( 'Posts in Trash'       , 'bulk-delete' ) , 'Bulk_Delete_Posts::render_delete_posts_from_trash'             , $this->posts_page , 'advanced' );
     }
 
