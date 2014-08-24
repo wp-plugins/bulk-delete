@@ -5,7 +5,7 @@ Plugin Script: bulk-delete.php
 Plugin URI: http://bulkwp.com
 Description: Bulk delete users and posts from selected categories, tags, post types, custom taxonomies or by post status like drafts, scheduled posts, revisions etc.
 Donate Link: http://sudarmuthu.com/if-you-wanna-thank-me
-Version: 5.2
+Version: 5.3
 License: GPL
 Author: Sudar
 Author URI: http://sudarmuthu.com/
@@ -36,7 +36,7 @@ Check readme file for full release notes
  * @package    Bulk_Delete
  * @subpackage core
  * @author     Sudar
- * @version    5.2
+ * @version    5.3
  */
 
 // Exit if accessed directly
@@ -56,7 +56,11 @@ final class Bulk_Delete {
      */
     private static $instance;
 
-    const VERSION                   = '5.2';
+    // version
+    const VERSION                   = '5.3';
+
+    // Numeric constants
+    const MENU_ORDER                = '26.9966';
 
     // page slugs
     const POSTS_PAGE_SLUG           = 'bulk-delete-posts';
@@ -203,6 +207,13 @@ final class Bulk_Delete {
         require_once self::$PLUGIN_DIR . '/include/class-bulk-delete-posts.php';
         require_once self::$PLUGIN_DIR . '/include/class-bulk-delete-pages.php';
         require_once self::$PLUGIN_DIR . '/include/class-bulk-delete-users.php';
+
+        require_once self::$PLUGIN_DIR . '/include/misc/class-bulk-delete-misc.php';
+        require_once self::$PLUGIN_DIR . '/include/misc/class-bulk-delete-jetpack-contact-form-messages.php';
+
+        require_once self::$PLUGIN_DIR . '/include/settings/class-bd-settings-page.php';
+        require_once self::$PLUGIN_DIR . '/include/settings/setting-helpers.php';
+
         require_once self::$PLUGIN_DIR . '/include/class-bulk-delete-system-info.php';
         require_once self::$PLUGIN_DIR . '/include/class-bulk-delete-util.php';
         require_once self::$PLUGIN_DIR . '/include/class-bd-license.php';
@@ -240,14 +251,42 @@ final class Bulk_Delete {
      * Add navigation menu
      */
 	function add_menu() {
-        add_menu_page( __( 'Bulk Delete', 'bulk-delete' ) , __( 'Bulk Delete', 'bulk-delete' ), 'manage_options', self::POSTS_PAGE_SLUG, array( &$this, 'display_posts_page' ), 'dashicons-trash', '26.9966' );
+        add_menu_page( __( 'Bulk WP', 'bulk-delete' ), __( 'Bulk WP', 'bulk-delete' ), 'manage_options', self::POSTS_PAGE_SLUG, array( &$this, 'display_posts_page' ), 'dashicons-trash', self::MENU_ORDER );
 
         $this->posts_page = add_submenu_page( self::POSTS_PAGE_SLUG , __( 'Bulk Delete Posts'       , 'bulk-delete' ) , __( 'Bulk Delete Posts' , 'bulk-delete' ) , 'delete_posts'     , self::POSTS_PAGE_SLUG , array( &$this                    , 'display_posts_page' ) );
         $this->pages_page = add_submenu_page( self::POSTS_PAGE_SLUG , __( 'Bulk Delete Pages'       , 'bulk-delete' ) , __( 'Bulk Delete Pages' , 'bulk-delete' ) , 'delete_pages'     , self::PAGES_PAGE_SLUG , array( &$this                    , 'display_pages_page' ) );
         $this->users_page = add_submenu_page( self::POSTS_PAGE_SLUG , __( 'Bulk Delete Users'       , 'bulk-delete' ) , __( 'Bulk Delete Users' , 'bulk-delete' ) , 'delete_users'     , self::USERS_PAGE_SLUG , array( &$this                    , 'display_users_page' ) );
-        $this->cron_page  = add_submenu_page( self::POSTS_PAGE_SLUG , __( 'Bulk Delete Schedules'   , 'bulk-delete' ) , __( 'Schedules'         , 'bulk-delete' ) , 'delete_posts'     , self::CRON_PAGE_SLUG  , array( &$this                    , 'display_cron_page' ) );
+
+        /**
+         * Runs just after adding all *delete* menu items to Bulk WP main menu
+         *
+         * This action is primarily for adding extra *delete* menu items to the Bulk WP main menu.
+         *
+         * @since 5.3
+         */
+        do_action( 'bd_after_primary_menus' );
+
+        /**
+         * Runs just before adding non-action menu items to Bulk WP main menu
+         *
+         * This action is primarily for adding extra menu items before non-action menu items to the Bulk WP main menu.
+         *
+         * @since 5.3
+         */
+        do_action( 'bd_before_secondary_menus' );
+
+        $this->cron_page  = add_submenu_page( self::POSTS_PAGE_SLUG , __( 'Bulk Delete Schedules'   , 'bulk-delete' ) , __( 'Scheduled Jobs'    , 'bulk-delete' ) , 'delete_posts'     , self::CRON_PAGE_SLUG  , array( &$this                    , 'display_cron_page' ) );
         $this->addon_page = add_submenu_page( self::POSTS_PAGE_SLUG , __( 'Addon Licenses'          , 'bulk-delete' ) , __( 'Addon Licenses'    , 'bulk-delete' ) , 'activate_plugins' , self::ADDON_PAGE_SLUG , array( 'BD_License'              , 'display_addon_page' ) );
         $this->info_page  = add_submenu_page( self::POSTS_PAGE_SLUG , __( 'Bulk Delete System Info' , 'bulk-delete' ) , __( 'System Info'       , 'bulk-delete' ) , 'manage_options'   , self::INFO_PAGE_SLUG  , array( 'Bulk_Delete_System_Info' , 'display_system_info' ) );
+
+        /**
+         * Runs just after adding all menu items to Bulk WP main menu
+         *
+         * This action is primarily for adding extra menu items to the Bulk WP main menu.
+         *
+         * @since 5.3
+         */
+        do_action( 'bd_after_all_menus' );
 
         // enqueue JavaScript
         add_action( 'admin_print_scripts-' . $this->posts_page, array( &$this, 'add_script') );
@@ -281,7 +320,6 @@ final class Bulk_Delete {
 
         /* Trigger the add_meta_boxes hooks to allow meta boxes to be added */
         do_action('add_meta_boxes_' . $this->posts_page, null);
-        do_action('add_meta_boxes', $this->posts_page, null);
 
         /* Enqueue WordPress' script for handling the meta boxes */
         wp_enqueue_script('postbox');
@@ -303,6 +341,14 @@ final class Bulk_Delete {
         add_meta_box( self::BOX_DUPLICATE_TITLE , __( 'By Duplicate Title'   , 'bulk-delete' ) , 'Bulk_Delete_Posts::render_delete_posts_by_duplicate_title_box' , $this->posts_page , 'advanced' );
         add_meta_box( self::BOX_POST_BY_ROLE    , __( 'By User Role'         , 'bulk-delete' ) , 'Bulk_Delete_Posts::render_delete_posts_by_user_role_box'       , $this->posts_page , 'advanced' );
         add_meta_box( self::BOX_POST_FROM_TRASH , __( 'Posts in Trash'       , 'bulk-delete' ) , 'Bulk_Delete_Posts::render_delete_posts_from_trash'             , $this->posts_page , 'advanced' );
+
+        /**
+         * Add meta box in delete posts page
+         * This hook can be used for adding additional meta boxes in delete posts page
+         *
+         * @since 5.3
+         */
+        do_action( 'bd_add_meta_box_for_posts' );
     }
 
     /**
@@ -321,7 +367,6 @@ final class Bulk_Delete {
 
         /* Trigger the add_meta_boxes hooks to allow meta boxes to be added */
         do_action('add_meta_boxes_' . $this->pages_page, null);
-        do_action('add_meta_boxes', $this->pages_page, null);
 
         /* Enqueue WordPress' script for handling the meta boxes */
         wp_enqueue_script('postbox');
@@ -335,6 +380,14 @@ final class Bulk_Delete {
     function add_delete_pages_meta_boxes() {
         add_meta_box( self::BOX_PAGE_STATUS     , __( 'By Page status' , 'bulk-delete' ) , 'Bulk_Delete_Pages::render_delete_pages_by_status_box' , $this->pages_page , 'advanced' );
         add_meta_box( self::BOX_PAGE_FROM_TRASH , __( 'Pages in Trash' , 'bulk-delete' ) , 'Bulk_Delete_Pages::render_delete_pages_from_trash'    , $this->pages_page , 'advanced' );
+
+        /**
+         * Add meta box in delete pages page
+         * This hook can be used for adding additional meta boxes in delete pages page
+         *
+         * @since 5.3
+         */
+        do_action( 'bd_add_meta_box_for_pages' );
     }
 
     /**
@@ -351,7 +404,6 @@ final class Bulk_Delete {
 
         /* Trigger the add_meta_boxes hooks to allow meta boxes to be added */
         do_action('add_meta_boxes_' . $this->users_page, null);
-        do_action('add_meta_boxes', $this->users_page, null);
 
         /* Enqueue WordPress' script for handling the meta boxes */
         wp_enqueue_script('postbox');
@@ -362,6 +414,14 @@ final class Bulk_Delete {
      */
     function add_delete_users_meta_boxes() {
         add_meta_box( self::BOX_USERS, __( 'By User Role', 'bulk-delete' ), 'Bulk_Delete_Users::render_delete_users_by_role_box', $this->users_page, 'advanced' );
+
+        /**
+         * Add meta box in delete users page
+         * This hook can be used for adding additional meta boxes in delete users page
+         *
+         * @since 5.3
+         */
+        do_action( 'bd_add_meta_box_for_users' );
     }
 
     /**
