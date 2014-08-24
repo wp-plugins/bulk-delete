@@ -1,16 +1,14 @@
 === Bulk Delete ===
 Contributors: sudar  
 Tags: post, comment, delete, bulk, mass, draft, revision, page  
-Requires at least: 3.8  
-Tested up to: 3.9.1  
+Requires at least: 3.9  
+Tested up to: 3.9.2  
 Donate Link: http://sudarmuthu.com/if-you-wanna-thank-me  
-Stable tag: 5.2  
+Stable tag: 5.3  
 
 Bulk delete posts, pages or users in bulk based on different conditions and filters.
 
 == Description ==
-
-**NOTE: v5.0 and the above of this plugin is NOT compatible with any addons whose version is less than v0.5. If you are using an addon for this plugin, then make sure you that you have at least v0.5 or above of the addon before upgrading to v5.0 of this plugin. If you have any questions regarding this, then post them in the [BulkWP support forums][1]**
 
 Bulk Delete is a WordPress Plugin that allows you to delete posts, pages and users in bulk based on different conditions and filters.
 
@@ -79,6 +77,9 @@ Like posts, all the above options support the following filters as well
 
 - Delete duplicate posts by title (Available as a [Pro addon](http://bulkwp.com/addons/bulk-delete-posts-by-duplicate-title/?utm_source=wprepo&utm_campaign=BulkDelete&utm_medium=readme))
 
+#### Deleting other items
+- Delete Jetpack Contact Form Messages
+
 More options coming soon :)
 
 As you can see, the Plugin provide comprehensive options and filters to perform bulk deletion.
@@ -94,6 +95,8 @@ The following are the popular pro addons that are available for purchase. The fu
 - **Delete posts by duplicate title** - Adds the ability to delete posts based on duplicate title. [More details](http://bulkwp.com/addons/bulk-delete-posts-by-duplicate-title/?utm_source=wprepo&utm_campaign=BulkDelete&utm_medium=readme).
 - **Delete posts by user role** - Adds the ability to delete posts based on user role. [More details](http://bulkwp.com/addons/bulk-delete-posts-by-user-role/?utm_source=wprepo&utm_campaign=BulkDelete&utm_medium=readme).
 - **Delete from trash** - Adds the ability to delete posts and pages from trash. [More details](http://bulkwp.com/addons/bulk-delete-from-trash/?utm_source=wprepo&utm_campaign=BulkDelete&utm_medium=readme).
+- **Delete Jetpack Contact Form Messages** - Adds the ability to delete Jetpack Contact Form Messages based on filters and to schedule automatic deletion. [More details](http://bulkwp.com/addons/bulk-delete-jetpack-contact-form-messages/?utm_source=wprepo&utm_campaign=BulkDelete&utm_medium=readme).
+- **Scheduler Email** - Sends email whenever a Bulk WP Scheduler runs. [More details](http://bulkwp.com/addons/scheduler-email/?utm_source=wprepo&utm_campaign=BulkDelete&utm_medium=readme).
 - **Scheduler for deleting posts Category** - Adds the ability to schedule auto delete of posts based on category. [More details](http://bulkwp.com/addons/scheduler-for-deleting-posts-by-category/?utm_source=wprepo&utm_campaign=BulkDelete&utm_medium=readme).
 - **Scheduler for deleting posts Tag** - Adds the ability to schedule auto delete of posts based on tag. [More details](http://bulkwp.com/addons/scheduler-for-deleting-posts-by-tag/?utm_source=wprepo&utm_campaign=BulkDelete&utm_medium=readme).
 - **Scheduler for deleting posts by Custom Taxonomy** - Adds the ability to schedule auto delete of posts based on custom taxonomy. [More details](http://bulkwp.com/addons/scheduler-for-deleting-posts-by-taxonomy/?utm_source=wprepo&utm_campaign=BulkDelete&utm_medium=readme).
@@ -200,9 +203,9 @@ If you choose the option "Move to trash" then you can find them from trash. But 
 
 = Is it possible that some Plugin are not compatible with Bulk Delete? =
 
-Yes. If a Plugin rewrites the query vars by using `add_filter( 'pre_get_posts' )` then it may be incompatible with this Plugin. [The event calendar](http://wordpress.org/plugins/the-events-calendar/) is one such Plugin.
+Yes. If a Plugin rewrites the query vars by using `add_filter( 'pre_get_posts' )` then it may be incompatible with this Plugin.
 
-I currently disable and enable the `pre_get_posts` filter if I find that "The event calendar" Plugin is installed. It is not ideal, but it gets the work done. If you find any other Plugin with which Bulk Delete doesn't work, then let me know and I will try to see if I can add support through some hack like this.
+If you find any Plugin with which Bulk Delete doesn't work, then let me know and I will try to see if I can add support through some hack.
 
 = Is it possible to schedule deletion of posts? =
 
@@ -245,6 +248,24 @@ You can contact us by posting about it in our [support forum](http://bulkwp.com/
 
 This Readme file was generated using <a href = 'http://sudarmuthu.com/wordpress/wp-readme'>wp-readme</a>, which generates readme files for WordPress Plugins.
 == Changelog ==
+
+= 2014-08-17 - v5.3 - (Dev time: 17 hours) =
+- New: Ability to delete Jetpack Contact Form Messages (Issue #72)
+- New: New Addon to send email whenever a Bulk WP Scheduler runs
+- New: Settings screen for addons (Issue #78)
+- New: Add setting helper functions for addons
+
+- Tweak: Tweak the names of the menu items (Issue #73)
+- Tweak: Add information about `DISABLE_WP_CRON` in system info
+- Tweak: Tweak labels in Scheduled Jobs page (Issue #71)
+- Tweak: Removed unused variable
+- Tweak: Removed old compatibility code for `The Events Calendar` plugin
+- Tweak: Add filters to extend menu items (Issue #74)
+- Tweak: Add filters to extend meta boxes in each page (Issue #75)
+- Tweak: Remove `upgraded from` from system info (Issue #77)
+
+- Bug: Fixed a warning that happened because of duplicate call to `add_meta_boxes`
+
 
 = 2014-07-03 - v5.2 - (Dev time: 8 hours) =
 - New: Ability to delete users in batches (Issue #47)
@@ -448,6 +469,9 @@ This Readme file was generated using <a href = 'http://sudarmuthu.com/wordpress/
 *   First version
 
 == Upgrade Notice ==
+
+= 5.3 =
+Ability to delete Jetpack Contact Form messages
 
 = 5.2 =
 Ability to delete users in batches and a new addon to delete posts based on users
