@@ -120,7 +120,7 @@ class Bulk_Delete_Pages {
         }
 ?>
                     </select>
-                    <span class = "bd-pages-pro" style = "color:red"><?php _e('Only available in Pro Addon', 'bulk-delete'); ?> <a href = "http://bulkwp.com/addons/scheduler-for-deleting-pages-by-status/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow">Buy now</a></span>
+                    <span class = "bd-pages-pro" style = "color:red"><?php _e('Only available in Pro Addon', 'bulk-delete'); ?> <a href = "http://bulkwp.com/addons/scheduler-for-deleting-pages-by-status/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-sp">Buy now</a></span>
                 </td>
             </tr>
         </table>
@@ -268,16 +268,35 @@ class Bulk_Delete_Pages {
         <p>
             <span class = "bd-pages-trash-pro" style = "color:red">
                 <?php _e( 'You need "Bulk Delete From Trash" Addon, to delete pages in Trash.', 'bulk-delete' ); ?>
-                <a href = "http://bulkwp.com/addons/bulk-delete-from-trash/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow">Buy now</a>
+                <a href = "http://bulkwp.com/addons/bulk-delete-from-trash/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-th">Buy now</a>
             </span>
         </p>
         <!-- pages In Trash box end-->
 <?php
         } else {
-            Bulk_Delete_From_Trash::render_delete_pages_from_trash();
+            /**
+             * Render delete pages from trash box
+             *
+             * @since 5.4
+             */
+            do_action( 'bd_render_delete_pages_from_trash' );
         }
+    }
+
+    /**
+     * Filter JS Array and add validation hooks
+     *
+     * @since 5.4
+     * @static
+     * @param  array $js_array JavaScript Array
+     * @return array           Modified JavaScript Array
+     */
+    public static function filter_js_array( $js_array ) {
+        $js_array['dt_iterators'][] = '_pages';
+        return $js_array;
     }
 }
 
 add_action( 'bd_delete_pages_by_status', array( 'Bulk_Delete_Pages', 'do_delete_pages_by_status' ) );
+add_filter( 'bd_javascript_array', array( 'Bulk_Delete_Pages' , 'filter_js_array' ) );
 ?>

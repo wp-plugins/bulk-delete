@@ -76,7 +76,7 @@ class Bulk_Delete_Jetpack_Contact_Form_Message {
                     </td>
                     <td>
                         <label for="smbd_feedback"><?php _e( 'Delete Messages based on filters', 'bulk-delete' ); ?></label>
-                        <span class = "bd-feedback-pro" style = "color:red; vertical-align: middle;"><?php _e( 'Only available in Pro Addon', 'bulk-delete' ); ?> <a href = "http://bulkwp.com/addons/bulk-delete-jetpack-contact-form-messages/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow" target="_blank">Buy now</a></span>
+                        <span class = "bd-feedback-pro" style = "color:red; vertical-align: middle;"><?php _e( 'Only available in Pro Addon', 'bulk-delete' ); ?> <a href = "http://bulkwp.com/addons/bulk-delete-jetpack-contact-form-messages/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-jcm" target="_blank">Buy now</a></span>
                     </td>
                 </tr>
             </table>
@@ -150,18 +150,35 @@ class Bulk_Delete_Jetpack_Contact_Form_Message {
                 }
 ?>
                     </select>
-                    <span class = "bd-feedback-pro" style = "color:red"><?php _e( 'Only available in Pro Addon', 'bulk-delete' ); ?> <a href = "http://bulkwp.com/addons/bulk-delete-jetpack-contact-form-messages/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow" target="_blank">Buy now</a></span>
+                    <span class = "bd-feedback-pro" style = "color:red"><?php _e( 'Only available in Pro Addon', 'bulk-delete' ); ?> <a href = "http://bulkwp.com/addons/bulk-delete-jetpack-contact-form-messages/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-jcm" target="_blank">Buy now</a></span>
                 </td>
             </tr>
 
             </table>
             </fieldset>
             <p class="submit">
-                <button type='submit' name='bd_action' value = 'delete_jetpack_messages' class='button-primary'><?php _e( 'Bulk Delete ', 'bulk-delete' ) ?>&raquo;</button>
+                <button type='submit' name='bd_action' value='delete_jetpack_messages' class='button-primary'><?php _e( 'Bulk Delete ', 'bulk-delete' ) ?>&raquo;</button>
             </p>
             <!-- Delete Jetpack Feedback box end-->
 <?php
         }
+    }
+
+    /**
+     * Filter JS Array and add validation hooks
+     *
+     * @since 5.4
+     * @static
+     * @param  array $js_array JavaScript Array
+     * @return array           Modified JavaScript Array
+     */
+    public static function filter_js_array( $js_array ) {
+        $js_array['dt_iterators'][] = '_feedback';
+        $js_array['validators']['delete_jetpack_messages'] = 'noValidation';
+
+        $js_array['pre_action_msg']['delete_jetpack_messages'] = 'deleteJetpackWarning';
+        $js_array['msg']['deleteJetpackWarning'] = __( 'Are you sure you want to delete all the Jetpack contact form messages based on the selected filters?', 'bulk-delete' );
+        return $js_array;
     }
 
     /**
@@ -303,6 +320,8 @@ class Bulk_Delete_Jetpack_Contact_Form_Message {
 }
 
 // hooks
-add_action( 'bd_add_meta_box_for_misc',   array( 'Bulk_Delete_Jetpack_Contact_Form_Message', 'add_delete_jetpack_messages_meta_box' ) );
+add_action( 'bd_add_meta_box_for_misc'  , array( 'Bulk_Delete_Jetpack_Contact_Form_Message', 'add_delete_jetpack_messages_meta_box' ) );
 add_action( 'bd_delete_jetpack_messages', array( 'Bulk_Delete_Jetpack_Contact_Form_Message', 'do_delete_jetpack_messages' ) );
+
+add_filter( 'bd_javascript_array'       , array( 'Bulk_Delete_Jetpack_Contact_Form_Message', 'filter_js_array' ) );
 ?>

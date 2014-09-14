@@ -129,7 +129,7 @@ class Bulk_Delete_Posts {
         }
 ?>
                     </select>
-                    <span class = "bd-post-status-pro" style = "color:red"><?php _e( 'Only available in Pro Addon', 'bulk-delete' ); ?> <a href = "http://bulkwp.com/addons/scheduler-for-deleting-posts-by-status/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow">Buy now</a></span>
+                    <span class = "bd-post-status-pro" style = "color:red"><?php _e( 'Only available in Pro Addon', 'bulk-delete' ); ?> <a href = "http://bulkwp.com/addons/scheduler-for-deleting-posts-by-status/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-sps">Buy now</a></span>
                 </td>
             </tr>
         </table>
@@ -425,7 +425,7 @@ class Bulk_Delete_Posts {
         }
 ?>
                     </select>
-                    <span class = "bd-cats-pro" style = "color:red"><?php _e('Only available in Pro Addon', 'bulk-delete'); ?> <a href = "http://bulkwp.com/addons/scheduler-for-deleting-posts-by-category/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow">Buy now</a></span>
+                    <span class = "bd-cats-pro" style = "color:red"><?php _e('Only available in Pro Addon', 'bulk-delete'); ?> <a href = "http://bulkwp.com/addons/scheduler-for-deleting-posts-by-category/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-sc">Buy now</a></span>
                 </td>
             </tr>
 
@@ -658,7 +658,7 @@ class Bulk_Delete_Posts {
         }
 ?>
                     </select>
-                    <span class = "bd-tags-pro" style = "color:red"><?php _e('Only available in Pro Addon', 'bulk-delete'); ?> <a href = "http://bulkwp.com/addons/scheduler-for-deleting-posts-by-tag/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow">Buy now</a></span>
+                    <span class = "bd-tags-pro" style = "color:red"><?php _e('Only available in Pro Addon', 'bulk-delete'); ?> <a href = "http://bulkwp.com/addons/scheduler-for-deleting-posts-by-tag/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-st">Buy now</a></span>
                 </td>
             </tr>
 
@@ -934,7 +934,7 @@ class Bulk_Delete_Posts {
         }
 ?>
                     </select>
-                    <span class = "bd-taxs-pro" style = "color:red"><?php _e('Only available in Pro Addon', 'bulk-delete'); ?> <a href = "http://bulkwp.com/addons/scheduler-for-deleting-posts-by-taxonomy/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow">Buy now</a></span>
+                    <span class = "bd-taxs-pro" style = "color:red"><?php _e('Only available in Pro Addon', 'bulk-delete'); ?> <a href = "http://bulkwp.com/addons/scheduler-for-deleting-posts-by-taxonomy/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-stx">Buy now</a></span>
                 </td>
             </tr>
 
@@ -1186,7 +1186,7 @@ class Bulk_Delete_Posts {
         }
 ?>
                     </select>
-                    <span class = "bd-types-pro" style = "color:red"><?php _e('Only available in Pro Addon', 'bulk-delete'); ?> <a href = "http://bulkwp.com/addons/scheduler-for-deleting-posts-by-post-type/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow">Buy now</a></span>
+                    <span class = "bd-types-pro" style = "color:red"><?php _e('Only available in Pro Addon', 'bulk-delete'); ?> <a href = "http://bulkwp.com/addons/scheduler-for-deleting-posts-by-post-type/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-spt">Buy now</a></span>
                 </td>
             </tr>
 
@@ -1498,7 +1498,7 @@ class Bulk_Delete_Posts {
         <p>
             <span class = "bd-post-custom-field-pro" style = "color:red">
                 <?php _e( 'You need "Bulk Delete Posts by Custom Field" Addon, to delete post by custom field.', 'bulk-delete' ); ?>
-                <a href = "http://bulkwp.com/addons/bulk-delete-posts-by-custom-field/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow">Buy now</a>
+                <a href = "http://bulkwp.com/addons/bulk-delete-posts-by-custom-field/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-cf">Buy now</a>
             </span>
         </p>
         <!-- Custom Field box end-->
@@ -1527,7 +1527,7 @@ class Bulk_Delete_Posts {
         <p>
             <span class = "bd-post-title-pro" style = "color:red">
                 <?php _e( 'You need "Bulk Delete Posts by Title" Addon, to delete post by title.', 'bulk-delete' ); ?>
-                <a href = "http://bulkwp.com/addons/bulk-delete-posts-by-title/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow">Buy now</a>
+                <a href = "http://bulkwp.com/addons/bulk-delete-posts-by-title/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-ti">Buy now</a>
             </span>
         </p>
         <!-- Title box end-->
@@ -1557,7 +1557,7 @@ class Bulk_Delete_Posts {
         <p>
             <span class = "bd-post-title-pro" style = "color:red">
                 <?php _e( 'You need "Bulk Delete Posts by Duplicate Title" Addon, to delete post by duplicate title.', 'bulk-delete' ); ?>
-                <a href = "http://bulkwp.com/addons/bulk-delete-posts-by-duplicate-title/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow">Buy now</a>
+                <a href = "http://bulkwp.com/addons/bulk-delete-posts-by-duplicate-title/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-dti">Buy now</a>
             </span>
         </p>
         <!-- Duplicate Title box end-->
@@ -1585,7 +1585,7 @@ class Bulk_Delete_Posts {
         <p>
             <span class = "bd-post-by-role-pro" style = "color:red">
                 <?php _e( 'You need "Bulk Delete Posts by User Role" Addon, to delete post based on User Role', 'bulk-delete' ); ?>
-                <a href = "http://bulkwp.com/addons/bulk-delete-posts-by-user-role/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow">Buy now</a>
+                <a href = "http://bulkwp.com/addons/bulk-delete-posts-by-user-role/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-ur">Buy now</a>
             </span>
         </p>
         <!-- Posts by user role end-->
@@ -1613,14 +1613,43 @@ class Bulk_Delete_Posts {
         <p>
             <span class = "bd-post-trash-pro" style = "color:red">
                 <?php _e( 'You need "Bulk Delete From Trash" Addon, to delete post in Trash.', 'bulk-delete' ); ?>
-                <a href = "http://bulkwp.com/addons/bulk-delete-from-trash/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow">Buy now</a>
+                <a href = "http://bulkwp.com/addons/bulk-delete-from-trash/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-th">Buy now</a>
             </span>
         </p>
         <!-- Posts In Trash box end-->
 <?php
         } else {
-            Bulk_Delete_From_Trash::render_delete_posts_from_trash();
+            /**
+             * Render delete posts from trash box
+             *
+             * @since 5.4
+             */
+            do_action( 'bd_render_delete_posts_from_trash' );
         }
+    }
+
+    /**
+     * Filter JS Array and add validation hooks
+     *
+     * @since 5.4
+     * @static
+     * @param  array $js_array JavaScript Array
+     * @return array           Modified JavaScript Array
+     */
+    public static function filter_js_array( $js_array ) {
+        $js_array['msg']['deletePostsWarning'] = __( 'Are you sure you want to delete all the posts based on the selected option?', 'bulk-delete' );
+        $js_array['msg']['selectPostOption'] = __( 'Please select posts from at least one option', 'bulk-delete' );
+
+        $js_array['validators']['delete_posts_by_url'] = 'validateUrl';
+        $js_array['error_msg']['delete_posts_by_url'] = 'enterUrl';
+        $js_array['msg']['enterUrl'] = __( 'Please enter at least one post url', 'bulk-delete' );
+
+        $js_array['dt_iterators'][] = '_cats';
+        $js_array['dt_iterators'][] = '_tags';
+        $js_array['dt_iterators'][] = '_taxs';
+        $js_array['dt_iterators'][] = '_types';
+        $js_array['dt_iterators'][] = '_post_status';
+        return $js_array;
     }
 
     /**
@@ -1659,4 +1688,5 @@ add_action( 'bd_delete_posts_by_url'       , array( 'Bulk_Delete_Posts' , 'do_de
 add_action( 'bd_delete_posts_by_revision'  , array( 'Bulk_Delete_Posts' , 'do_delete_posts_by_revision' ) );
 
 add_action( 'bd_delete_cron'               , array( 'Bulk_Delete_Posts' , 'do_delete_cron' ) );
+add_filter( 'bd_javascript_array'          , array( 'Bulk_Delete_Posts' , 'filter_js_array' ) );
 ?>
