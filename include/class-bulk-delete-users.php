@@ -99,7 +99,7 @@ class Bulk_Delete_Users {
         }
 ?>
                     </select>
-                    <span class = "bdu-users-by-role-pro" style = "color:red"><?php _e( 'Only available in Pro Addon', 'bulk-delete' ); ?> <a href = "http://bulkwp.com/addons/scheduler-for-deleting-users-by-role/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow">Buy now</a></span>
+                    <span class = "bdu-users-by-role-pro" style = "color:red"><?php _e( 'Only available in Pro Addon', 'bulk-delete' ); ?> <a href = "http://bulkwp.com/addons/scheduler-for-deleting-users-by-role/?utm_source=wpadmin&utm_campaign=BulkDelete&utm_medium=buynow&utm_content=bd-u-ur">Buy now</a></span>
                 </td>
             </tr>
 
@@ -210,6 +210,26 @@ class Bulk_Delete_Users {
     }
 
     /**
+     * Filter JS Array and add validation hooks
+     *
+     * @since 5.4
+     * @static
+     * @param  array $js_array JavaScript Array
+     * @return array           Modified JavaScript Array
+     */
+    public static function filter_js_array( $js_array ) {
+        $js_array['dt_iterators'][] = 'u_userrole';
+
+        $js_array['pre_action_msg']['delete_users_by_role'] = 'deleteUsersWarning';
+        $js_array['msg']['deleteUsersWarning'] = __( 'Are you sure you want to delete all the users from the selected user role?', 'bulk-delete' );
+
+        $js_array['error_msg']['delete_users_by_role'] = 'selectOneUserRole';
+        $js_array['msg']['selectOneUserRole'] = __( 'Select at least one user role from which users should be deleted', 'bulk-delete' );
+
+        return $js_array;
+    }
+
+    /**
      * Find the last login date/time of a user
      *
      * @static
@@ -224,4 +244,5 @@ class Bulk_Delete_Users {
 }
 
 add_action( 'bd_delete_users_by_role', array( 'Bulk_Delete_Users', 'do_delete_users_by_role' ) );
+add_filter( 'bd_javascript_array', array( 'Bulk_Delete_Users' , 'filter_js_array' ) );
 ?>
