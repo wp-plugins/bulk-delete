@@ -5,7 +5,7 @@ Plugin Script: bulk-delete.php
 Plugin URI: http://bulkwp.com
 Description: Bulk delete users and posts from selected categories, tags, post types, custom taxonomies or by post status like drafts, scheduled posts, revisions etc.
 Donate Link: http://sudarmuthu.com/if-you-wanna-thank-me
-Version: 5.4
+Version: 5.4.1
 License: GPL
 Author: Sudar
 Author URI: http://sudarmuthu.com/
@@ -36,7 +36,7 @@ Check readme file for full release notes
  * @package    Bulk_Delete
  * @subpackage core
  * @author     Sudar
- * @version    5.4
+ * @version    5.4.1
  */
 
 // Exit if accessed directly
@@ -57,7 +57,7 @@ final class Bulk_Delete {
     private static $instance;
 
     // version
-    const VERSION                   = '5.4';
+    const VERSION                   = '5.4.1';
 
     // Numeric constants
     const MENU_ORDER                = '26.9966';
@@ -443,7 +443,7 @@ final class Bulk_Delete {
 
         $ui = $wp_scripts->query('jquery-ui-core');
 
-        $url = "http://ajax.aspnetcdn.com/ajax/jquery.ui/{$ui->ver}/themes/smoothness/jquery-ui.css";
+        $url = "http://ajax.googleapis.com/ajax/libs/jqueryui/{$ui->ver}/themes/smoothness/jquery-ui.css";
         wp_enqueue_style('jquery-ui-smoothness', $url, false, $ui->ver);
         wp_enqueue_style('jquery-ui-timepicker', plugins_url('/style/jquery-ui-timepicker.css', __FILE__), array(), '1.1.1');
 

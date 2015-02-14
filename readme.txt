@@ -4,7 +4,7 @@ Tags: post, comment, delete, bulk, mass, draft, revision, page, meta fields
 Requires at least: 3.9  
 Tested up to: 4.0  
 Donate Link: http://sudarmuthu.com/if-you-wanna-thank-me  
-Stable tag: 5.4  
+Stable tag: 5.4.1  
 
 Bulk delete posts, pages, users and meta fields in bulk based on different conditions and filters.
 
@@ -166,7 +166,9 @@ Thanks to [Time picker addon](http://trentrichardson.com/examples/timepicker/) J
 
 == Installation ==
 
-Extract the zip file and just drop the contents in the wp-content/plugins/ directory of your WordPress installation and then activate the Plugin from Plugins page or simply use the automatic plugin installer to directly install the plugin.
+The simplest way to install the plugin is to use the built-in automatic plugin installer. Go to plugins -> Add New and then enter the name of the plugin to automatically install it.
+
+If for some reason the above method doesn't work then you can download the plugin as a zip file, extract it and then use your favorite FTP client and then upload the contents of the zip file to the wp-content/plugins/ directory of your WordPress installation and then activate the Plugin from Plugins page.
 
 == Frequently Asked Questions ==
 
@@ -244,6 +246,9 @@ You can contact us by posting about it in our [support forum](http://bulkwp.com/
 
 This Readme file was generated using <a href = 'http://sudarmuthu.com/wordpress/wp-readme'>wp-readme</a>, which generates readme files for WordPress Plugins.
 == Changelog ==
+
+= 2015-02-14 - v5.4.1 - (Dev time: 0.5 hours) =
+- Tweak: Use Google CDN for jQuery UI CSS, instead of ASP.NET
 
 = 2014-09-14 - v5.4 - (Dev time: 20 hours) =
 - New: Added the ability to delete post meta fields (Issue #43)
@@ -477,6 +482,9 @@ This Readme file was generated using <a href = 'http://sudarmuthu.com/wordpress/
 *   First version
 
 == Upgrade Notice ==
+
+= 5.4.1 =
+Changed jQuery UI CSS CDN to Google CDN from ASP.NET, which seems to be discontinued
 
 = 5.4 =
 Ability to delete post, comment and user meta fields
