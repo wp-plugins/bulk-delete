@@ -2,7 +2,7 @@
 Contributors: sudar  
 Tags: post, comment, delete, bulk, mass, draft, revision, page, meta fields  
 Requires at least: 3.9  
-Tested up to: 4.0  
+Tested up to: 4.1  
 Donate Link: http://sudarmuthu.com/if-you-wanna-thank-me  
 Stable tag: 5.4.1  
 
