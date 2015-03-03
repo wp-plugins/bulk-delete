@@ -1,10 +1,10 @@
 === Bulk Delete ===
 Contributors: sudar  
-Tags: post, comment, delete, bulk, mass, draft, revision, page, meta fields  
+Tags: mass, bulk, delete, post, comment, draft, revision, page, user, meta fields  
 Requires at least: 3.9  
-Tested up to: 4.1  
+Tested up to: 4.1.1  
 Donate Link: http://sudarmuthu.com/if-you-wanna-thank-me  
-Stable tag: 5.4.1  
+Stable tag: 5.4.2  
 
 Bulk delete posts, pages, users and meta fields in bulk based on different conditions and filters.
 
@@ -246,6 +246,11 @@ You can contact us by posting about it in our [support forum](http://bulkwp.com/
 
 This Readme file was generated using <a href = 'http://sudarmuthu.com/wordpress/wp-readme'>wp-readme</a>, which generates readme files for WordPress Plugins.
 == Changelog ==
+
+= 2015-03-03 - 5.4.2 (Dev time: 5.0 hours) =
+- Tweak: Improve performance of DB queries to prevent timeouts. (Issue #93)
+- Tweak: Add details about different post types in system info. (Issue #100)
+- Tweak: Add details about timezone settings in system info. (Issue #100)
 
 = 2015-02-14 - v5.4.1 - (Dev time: 0.5 hours) =
 - Tweak: Use Google CDN for jQuery UI CSS, instead of ASP.NET
