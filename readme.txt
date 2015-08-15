@@ -2,21 +2,19 @@
 Contributors: sudar  
 Tags: mass, bulk, delete, post, comment, draft, revision, page, user, meta fields  
 Requires at least: 3.9  
-Tested up to: 4.2.3  
+Tested up to: 4.3  
 Donate Link: http://sudarmuthu.com/if-you-wanna-thank-me  
-Stable tag: 5.5  
+Stable tag: 5.5.1  
 
-[![Build Status](https://scrutinizer-ci.com/g/sudar/bulk-delete/badges/build.png?b=master)](https://scrutinizer-ci.com/g/sudar/bulk-delete/build-status/master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/sudar/bulk-delete/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/sudar/bulk-delete/?branch=master)
-
-Bulk delete posts, pages, users and meta fields in bulk based on different conditions and filters.
+Bulk delete posts, pages, users, attachments and meta fields based on different conditions and filters.
 
 == Description ==
 
-Bulk Delete is a WordPress Plugin that allows you to delete posts, pages, users and meta fields in bulk based on different conditions and filters.
-
-The following conditions and filters are supported.
+Bulk Delete is a WordPress Plugin that allows you to delete posts, pages, attachments, users and meta fields in bulk based on different conditions and filters.
 
 ### Features
+
+The following conditions and filters are supported.
 
 #### Deleting posts
 
@@ -70,9 +68,9 @@ Like posts, all the above options support the following filters as well
 
 - Post date greater than X days
 - Post date less than X days
-- Only public posts
-- Only private posts
-- Restrict to first N posts
+- Only public pages
+- Only private pages
+- Restrict to first N pages
 - Delete permanently or just move to trash
 - Schedule deletion of pages automatically (Available as a [Pro addon](http://bulkwp.com/addons/scheduler-for-deleting-pages-by-status/?utm_source=wprepo&utm_campaign=BulkDelete&utm_medium=readme&utm_content=bd-sp))
 
@@ -87,11 +85,12 @@ Like posts, all the above options support the following filters as well
 - Delete users who have not logged in in the last X days
 
 #### Deleting Meta Fields
+
 - Delete Post meta fields
 - Delete Comment meta fields
 - Delete User meta fields
 
-#### Deleting Meta Fields
+#### Deleting Attachments
 
 - Delete Attachments (Available as a [Pro addon](http://bulkwp.com/addons/bulk-delete-attachments/?utm_source=wprepo&utm_campaign=BulkDelete&utm_medium=readme&utm_content=bd-at))
 
@@ -181,6 +180,8 @@ Thanks <a href="http://www.martincapodici.com">Martin Capodici</a> for providing
 
 Thanks to [Time picker addon](http://trentrichardson.com/examples/timepicker/) JavaScript library, which the Plugin uses.
 
+Thanks to [select2](https://select2.github.io/) JavaScript library, which the Plugin uses.
+
 == Installation ==
 
 The simplest way to install the plugin is to use the built-in automatic plugin installer. Go to plugins -> Add New and then enter the name of the plugin to automatically install it.
@@ -191,7 +192,7 @@ If for some reason the above method doesn't work then you can download the plugi
 
 = After installing the Plugin, I just see a blank page. =
 
-This can happen if you have huge number of posts and your server is very underpowered. Check your PHP error log to see if there are any errors and correct them. The most common problems are script timeout or running out of memory. Change your PHP.ini file and increase the script timeout and/or amount of memory used by PHP process.
+This can happen if you have huge number of posts and your server is very underpowered. Check your PHP error log to see if there are any errors and correct them. The most common problems are script timeout or running out of memory. Change your PHP.ini file and increase the script timeout and/or amount of memory used by PHP process. You can view the current values of these settings from the system info page which can be accessed by going to Bulk WP -> System Info.
 
 In particular try to change the following settings
 
@@ -201,13 +202,13 @@ In particular try to change the following settings
 
 You can also try to disable different sections of the Plugin, if you have huge number of posts.
 
-= How do I disable different sections of the Plugin =
-
-You can enable or disable different sections of the Plugin by choosing the required modules in the screen option. You can open screen options by clicking the link in the top right corner of the Plugin page.
-
 = How do I know what are the current values for these options configured in my server? =
 
 Access the System Info page using the menu Bulk WP -> System Info. The System info page displays the values for the different configuration options that are configured in your server.
+
+= How do I disable different sections of the Plugin =
+
+You can enable or disable different sections of the Plugin by choosing the required modules in the screen option. You can open screen options by clicking the link in the top right corner of the Plugin page.
 
 = Is it possible to restore the posts that I have deleted through the Plugin?  =
 
@@ -263,6 +264,17 @@ You can contact us by posting about it in our [support forum](http://bulkwp.com/
 
 This Readme file was generated using <a href = 'http://sudarmuthu.com/wordpress/wp-readme'>wp-readme</a>, which generates readme files for WordPress Plugins.
 == Changelog ==
+
+= 2015-08-15 - v5.5.1 (Dev time: 2.5 hours) =
+- New Features
+	- Added actions that are executed before and after a query is executed.
+	- Added actions that are executed before and after scripts and styles are enqueued.
+
+- Enhancements
+	- Added compatibility with "The Events Calendar" plugin.
+	- Added compatibility with "WooCommerce" plugin. (Issue #111)
+	- Display warning in the System Info page if certain required options are disabled. (Issue #106)
+	- Added information about "WP_CRON_LOCK_TIMEOUT" to System Info
 
 = 2015-07-21 - v5.5 (Dev time: 50 hours) =
 - New Features
@@ -517,6 +529,9 @@ This Readme file was generated using <a href = 'http://sudarmuthu.com/wordpress/
 *   First version
 
 == Upgrade Notice ==
+
+= 5.5.1 =
+Fixed compatibility issues with WooCommerce and The Event Calendar plugins
 
 = 5.5 =
 Added the ability to delete users based on user meta and lot of UI improvement
